@@ -5,8 +5,7 @@ import AppInput from '@/components/ui/AppInput.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import type { ActivityFactor, HarrisBenedictInput } from '@/types/calculator-inputs'
-
+import type { ActivityFactor, HarrisBenedictInput } from '@/logic/calculators/nutricao/harrisBenedict'
 const emit = defineEmits<{ calculate: [input: HarrisBenedictInput] }>()
 
 const weightKg = ref<number | null>(null)

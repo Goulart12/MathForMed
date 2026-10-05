@@ -4,8 +4,7 @@ import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import ScoreRow from '@/components/ui/ScoreRow.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import type { QsofaInput } from '@/types/calculator-inputs'
-
+import type { QsofaInput } from '@/logic/calculators/emergencia/qsofa'
 const emit = defineEmits<{ calculate: [input: QsofaInput] }>()
 
 const respiratoryRate = ref<number | null>(null)

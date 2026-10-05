@@ -3,8 +3,7 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import type { GlasgowInput } from '@/types/calculator-inputs'
-
+import type { GlasgowInput } from '@/logic/calculators/emergencia/glasgow'
 const emit = defineEmits<{ calculate: [input: GlasgowInput] }>()
 
 const eyes = ref<string>('4')

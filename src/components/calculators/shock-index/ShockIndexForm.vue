@@ -2,8 +2,7 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { ShockIndexInput } from '@/types/calculator-inputs'
-
+import type { ShockIndexInput } from '@/logic/calculators/emergencia/shockIndex'
 const emit = defineEmits<{ calculate: [input: ShockIndexInput] }>()
 
 const heartRate = ref<number | null>(null)

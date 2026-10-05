@@ -15,35 +15,36 @@ export interface KdigoStage extends ReferenceRange {
 }
 
 /**
- * KDIGO 2024 GFR stages.
+ * KDIGO 2024 GFR stages, kept as a tuple so that the positional lookups in
+ * {@link classifyKdigo} stay checked against the published length.
  *
  * @reference KDIGO. Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117–S314.
  */
-export const KDIGO_STAGES: readonly KdigoStage[] = [
-  { stage: 'G1', label: 'G1 — Normal or high', min: 90, severity: 'normal' },
-  { stage: 'G2', label: 'G2 — Mildly decreased', min: 60, max: 89, severity: 'normal' },
+export const KDIGO_STAGES = [
+  { stage: 'G1', label: 'G1 — Normal ou elevada', min: 90, severity: 'normal' },
+  { stage: 'G2', label: 'G2 — Ligeiramente reduzida', min: 60, max: 89, severity: 'normal' },
   {
     stage: 'G3a',
-    label: 'G3a — Mildly-to-moderately decreased',
+    label: 'G3a — Ligeiramente a moderadamente reduzida',
     min: 45,
     max: 59,
     severity: 'attention',
   },
   {
     stage: 'G3b',
-    label: 'G3b — Moderately-to-severely decreased',
+    label: 'G3b — Moderadamente a severamente reduzida',
     min: 30,
     max: 44,
     severity: 'attention',
   },
   {
     stage: 'G4',
-    label: 'G4 — Severely decreased',
+    label: 'G4 — Severamente reduzida',
     min: 15,
     max: 29,
     severity: 'critical',
   },
-  { stage: 'G5', label: 'G5 — Kidney failure', max: 14, severity: 'critical' },
+  { stage: 'G5', label: 'G5 — Falência renal', max: 14, severity: 'critical' },
 ] as const
 
 /**
@@ -71,5 +72,5 @@ export function classifyKdigo(gfr: number): KdigoStage {
  * complete staging table as an accordion.
  */
 export const KDIGO_REFERENCES: ReferenceRange[] = KDIGO_STAGES.map(
-  ({ label, min, max, severity }) => ({ label, min, max, severity }),
+  ({ label, min, max, severity }: KdigoStage) => ({ label, min, max, severity }),
 )

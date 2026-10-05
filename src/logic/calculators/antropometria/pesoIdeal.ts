@@ -28,8 +28,8 @@ export const ABW_TRIGGER_RATIO = 1.2
 const SEXES: readonly Sex[] = ['M', 'F']
 
 export const IBW_REFERENCES: ReferenceRange[] = [
-  { label: 'Male reference (50 + 2.3 × inches over 5 ft)', min: 45, max: 110, severity: 'info' },
-  { label: 'Female reference (45.5 + 2.3 × inches over 5 ft)', min: 40, max: 100, severity: 'info' },
+  { label: 'Referência masculino (50 + 2.3 × polegadas acima de 5 pés)', min: 45, max: 110, severity: 'info' },
+  { label: 'Referência feminino (45.5 + 2.3 × polegadas acima de 5 pés)', min: 40, max: 100, severity: 'info' },
 ]
 
 /**
@@ -68,23 +68,23 @@ export function calculateIdealBodyWeight(input: IdealBodyWeightInput): CalcResul
   if (useAdjusted) {
     const abw = ibw + 0.4 * (weightKg - ibw)
     subResults.push({
-      label: 'Adjusted Body Weight',
+      label: 'Peso Corporal Ajustado',
       value: round(abw, 1),
       unit: 'kg',
       severity: 'info',
-      interpretation: `Actual weight is ${round(weightKg / ibw, 2)}× the ideal weight, above the ${ABW_TRIGGER_RATIO}× threshold. Use the adjusted weight for loading doses of lipophilic drugs.`,
+      interpretation: `O peso atual é ${round(weightKg / ibw, 2)}× o peso ideal, acima do limiar de ${ABW_TRIGGER_RATIO}×. Use o peso ajustado para o cálculo da dose de carga de fármacos lipofílicos.`,
     })
   }
 
   return {
-    label: 'Ideal Body Weight',
+    label: 'Peso Ideal',
     value: round(ibw, 1),
     unit: 'kg',
     severity: 'info',
-    interpretation: `Devine ideal body weight ${round(ibw, 1)} kg for a ${round(heightCm, 1)} cm ${sex === 'M' ? 'male' : 'female'}.${
+    interpretation: `Peso ideal de Devine ${round(ibw, 1)} kg para ${sex === 'M' ? 'um homem' : 'uma mulher'} de ${round(heightCm, 1)} cm.${
       useAdjusted
-        ? ' Actual weight is above 120% of IBW, so the adjusted weight below should be used for drug loading.'
-        : ' Actual weight is within 120% of IBW, so the ideal weight applies directly.'
+        ? ' O peso atual está acima de 120% do peso ideal, portanto o peso ajustado abaixo deve ser usado para o cálculo da dose de carga.'
+        : ' O peso atual está dentro de 120% do peso ideal, portanto o peso ideal aplica-se diretamente.'
     }`,
     references: IBW_REFERENCES,
     subResults,

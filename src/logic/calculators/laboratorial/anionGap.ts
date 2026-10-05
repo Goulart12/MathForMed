@@ -34,8 +34,8 @@ export const FULL_HCO3 = 24
 
 export const ANION_GAP_REFERENCES: ReferenceRange[] = [
   { label: 'Normal (8–12 mEq/L)', min: 8, max: 12, severity: 'normal' },
-  { label: 'Elevated (12–20 mEq/L)', min: 12, max: 20, severity: 'attention' },
-  { label: 'Markedly elevated (> 20 mEq/L)', min: 20, severity: 'critical' },
+  { label: 'Elevado (12–20 mEq/L)', min: 12, max: 20, severity: 'attention' },
+  { label: 'Marcadamente elevado (> 20 mEq/L)', min: 20, severity: 'critical' },
 ]
 
 /** Interpretation of the delta ratio. */
@@ -63,7 +63,7 @@ export function interpretDeltaRatio(gap: number, bicarbonate: number): DeltaRati
     return {
       ratio: null,
       interpretation:
-        'Delta ratio not calculable: bicarbonate is at or above 24 mEq/L, so the elevated anion gap reflects a concurrent metabolic alkalosis rather than acidosis.',
+        'Razão delta não calculável: o bicarbonato está em 24 mEq/L ou acima, portanto o gap aniônico elevado reflete uma alcalose metabólica concomitante e não acidose.',
       severity: 'attention',
     }
   }
@@ -74,28 +74,28 @@ export function interpretDeltaRatio(gap: number, bicarbonate: number): DeltaRati
     return {
       ratio,
       interpretation:
-        'Normal anion gap with a hyperchloraemic metabolic acidosis.',
+        'Gap aniônico normal com acidose metabólica hiperclorêmica.',
       severity: 'attention',
     }
   }
   if (ratio < 0.8) {
     return {
       ratio,
-      interpretation: 'Mixed disorder: high anion gap acidosis plus a normal anion gap acidosis.',
+      interpretation: 'Distúrbio misto: acidose com gap aniônico elevado mais acidose com gap aniônico normal.',
       severity: 'attention',
     }
   }
   if (ratio <= 2) {
     return {
       ratio,
-      interpretation: 'Pure elevated anion gap metabolic acidosis.',
+      interpretation: 'Acidose metabólica pura por gap aniônico elevado.',
       severity: 'attention',
     }
   }
   return {
     ratio,
     interpretation:
-      'Elevated anion gap with a concurrent metabolic alkalosis.',
+      'Gap aniônico elevado com alcalose metabólica concomitante.',
     severity: 'attention',
   }
 }
@@ -137,7 +137,7 @@ export function calculateAnionGap(input: AnionGapInput): CalcResult {
 
   const subResults: CalcResult[] = [
     {
-      label: 'Measured Anion Gap',
+      label: 'Gap Aniônico medido',
       value: round(gap, 1),
       unit: 'mEq/L',
       severity: 'info',
@@ -147,35 +147,35 @@ export function calculateAnionGap(input: AnionGapInput): CalcResult {
 
   if (albumin != null) {
     subResults.push({
-      label: 'Albumin Correction',
+      label: 'Correção pela albumina',
       value: round(corrected - gap, 1),
       unit: 'mEq/L',
       severity: 'info',
-      interpretation: `2.5 × (4 − ${albumin}) = ${round(corrected - gap, 1)} mEq/L added back for hypoalbuminaemia.`,
+      interpretation: `2.5 × (4 − ${albumin}) = ${round(corrected - gap, 1)} mEq/L adicionados para compensar a hipoalbuminemia.`,
     })
   }
 
   if (reported > ANION_GAP_UPPER) {
     const delta = interpretDeltaRatio(reported, bicarbonate)
     subResults.push({
-      label: 'Delta Ratio',
-      value: delta.ratio ?? 'not calculable',
+      label: 'Razão delta',
+      value: delta.ratio ?? 'não calculável',
       severity: delta.severity,
       interpretation: delta.interpretation,
     })
   }
 
   return {
-    label: 'Anion Gap',
+    label: 'Gap Aniônico',
     value: reported,
     unit: 'mEq/L',
     severity,
-    interpretation: `Anion gap ${reported} mEq/L${
-      albumin != null ? ' (albumin-corrected)' : ''
-    } — reference 8 to 12 mEq/L. ${
+    interpretation: `Gap aniônico ${reported} mEq/L${
+      albumin != null ? ' (corrigido pela albumina)' : ''
+    } — referência de 8 a 12 mEq/L. ${
       reported > ANION_GAP_UPPER
-        ? 'An elevated anion gap indicates unmeasured anions; consider ketoacidosis, lactate, keto acids, toxins or renal failure.'
-        : 'The anion gap is within the reference interval.'
+        ? 'Um gap aniônico elevado indica ânions não medidos; considere cetoacidose, lactato, ácidos cetônicos, toxinas ou insuficiência renal.'
+        : 'O gap aniônico está dentro do intervalo de referência.'
     }`,
     references: ANION_GAP_REFERENCES,
     subResults,

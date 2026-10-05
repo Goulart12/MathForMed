@@ -22,16 +22,16 @@ describe('calculateIdealBodyWeight', () => {
   it('reports adjusted body weight above 120% of IBW', () => {
     const result = calculateIdealBodyWeight({ heightM: 1.8, weightKg: 120, sex: 'M' })
     expect(result.severity).toBe('info')
-    expect(result.interpretation).toContain('adjusted weight')
-    const abw = result.subResults?.find(sub => sub.label === 'Adjusted Body Weight')
+    expect(result.interpretation).toContain('peso ajustado')
+    const abw = result.subResults?.find(sub => sub.label === 'Peso Corporal Ajustado')
     // ABW = 75 + 0.4 × (120 − 75) = 93
     expect(abw?.value).toBeCloseTo(93, 1)
   })
 
   it('omits adjusted body weight at or below 120% of IBW', () => {
     const result = calculateIdealBodyWeight({ heightM: 1.8, weightKg: 85, sex: 'M' })
-    expect(result.subResults?.find(sub => sub.label === 'Adjusted Body Weight')).toBeUndefined()
-    expect(result.interpretation).toContain('applies directly')
+    expect(result.subResults?.find(sub => sub.label === 'Peso Corporal Ajustado')).toBeUndefined()
+    expect(result.interpretation).toContain('aplica-se diretamente')
   })
 
   it('throws CalcValidationError for an unknown sex', () => {

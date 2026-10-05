@@ -5,7 +5,7 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateCkdEpi', () => {
   it('computes 62.5 mL/min/1.73 m² for a 65-year-old female with creatinine 1.0 mg/dL', () => {
     const result = calculateCkdEpi({ age: 65, serumCreatinineMgDl: 1, sex: 'F' })
-    expect(result.label).toBe('eGFR (CKD-EPI 2021)')
+    expect(result.label).toBe('TFGe (CKD-EPI 2021)')
     expect(result.value).toBeCloseTo(62.5, 1)
     expect(result.unit).toBe('mL/min/1.73 m²')
     expect(result.severity).toBe('normal')
@@ -92,6 +92,6 @@ describe('calculateCkdEpi', () => {
 
   it('flags the equation as the race-neutral 2021 revision', () => {
     const result = calculateCkdEpi({ age: 50, serumCreatinineMgDl: 1, sex: 'M' })
-    expect(result.subResults?.find(sub => sub.label === 'Equation')?.value).toBe('CKD-EPI 2021')
+    expect(result.subResults?.find(sub => sub.label === 'Fórmula')?.value).toBe('CKD-EPI 2021')
   })
 })

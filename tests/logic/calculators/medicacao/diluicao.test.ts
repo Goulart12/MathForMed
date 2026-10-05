@@ -9,7 +9,7 @@ describe('calculateDilution', () => {
       initialVolumeMl: 2,
       finalConcentration: 10,
     })
-    expect(result.label).toBe('Diluent Volume')
+    expect(result.label).toBe('Volume do diluente')
     expect(result.value).toBe(18)
     expect(result.unit).toBe('mL')
     expect(result.severity).toBe('info')
@@ -22,8 +22,8 @@ describe('calculateDilution', () => {
       initialVolumeMl: 2,
       finalConcentration: 10,
     })
-    expect(result.subResults?.find(sub => sub.label === 'Final Volume')?.value).toBe(20)
-    expect(result.subResults?.find(sub => sub.label === 'Stock Volume')?.value).toBe(2)
+    expect(result.subResults?.find(sub => sub.label === 'Volume final')?.value).toBe(20)
+    expect(result.subResults?.find(sub => sub.label === 'Volume em estoque')?.value).toBe(2)
   })
 
   it('returns zero diluent when the stock already matches the target', () => {
@@ -65,7 +65,7 @@ describe('calculateDilution', () => {
       expect.unreachable('should have thrown')
     } catch (error) {
       expect((error as CalcValidationError).field).toBe('finalConcentration')
-      expect((error as Error).message).toContain('dilutes')
+      expect((error as Error).message).toContain('dilui')
     }
   })
 

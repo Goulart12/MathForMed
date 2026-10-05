@@ -1,16 +1,15 @@
 /**
- * TEMPORARY SHIM — design worktree only.
+ * Display metadata for every calculator, plus the search and grouping helpers
+ * the views need.
  *
- * Mirrors `src/logic/constants.ts` (`CALCULATORS_META`) from the `feat/calc-logic`
- * worktree. Home, category, search and favorites views all key off these ids, so
- * the ids here are the contract that must survive the merge byte-for-byte.
- *
- * MERGE: replace the body of this file with
- *   export { CALCULATORS_META } from '@/logic/constants'
- * and delete the local entries. Only `name` / `description` / `shortName` are
- * display copy; the ids and categories are what the rest of the app depends on.
+ * This registry is deliberately **not** a re-export of `src/logic/constants.ts`.
+ * The two carry different copy on purpose: the logic layer holds the domain
+ * reference (English, used by the documentation and the API), while this file
+ * holds the pt-BR copy the clinician actually reads in the app. Only the ids,
+ * their categories and their order are contractual, and
+ * `tests/architecture/boundaries.test.ts` fails the build if the two drift.
  */
-import type { CalculatorMeta } from '@/types/logic'
+import type { CalculatorMeta } from '@/logic/types'
 
 export const CALCULATORS_META: Record<string, CalculatorMeta> = {
   /* ---------------------------- antropometria ---------------------------- */
@@ -28,7 +27,7 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
     id: 'superficie-corporal',
     name: 'Superfície Corporal',
     shortName: 'SC',
-    description: 'Mosteller ou DuBois para dosear Drugs por superfície corporal.',
+    description: 'Mosteller ou DuBois para dosar medicamentos por superfície corporal.',
     category: 'antropometria',
     tags: ['sc', 'dose', 'mosteller', 'dubois', 'oncologia'],
     evidenceLevel: 'B',
@@ -196,11 +195,11 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
   /* ---------------------------- laboratorial ----------------------------- */
   'anion-gap': {
     id: 'anion-gap',
-    name: 'Anion Gap',
-    shortName: 'Anion gap',
-    description: 'Bre anionico corrigido pela albumina e razão delta.',
+    name: 'Gap Aniônico',
+    shortName: 'Gap aniônico',
+    description: 'Gap aniônico corrigido pela albumina e razão delta.',
     category: 'laboratorial',
-    tags: ['anion gap', 'acose', 'gasometria', 'eletrólitos'],
+    tags: ['gap aniônico', 'acidose', 'gasometria', 'eletrólitos'],
     evidenceLevel: 'B',
     reference: 'Emmett M, Narins RG. Medicine. 1977;56(1):38-54.',
   },

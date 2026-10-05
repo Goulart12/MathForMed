@@ -25,14 +25,14 @@ export const T2DM_TARGET_PERCENT = 7
 
 export const HBA1C_REFERENCES: ReferenceRange[] = [
   { label: 'Normal (< 5.7%)', max: 5.7, severity: 'normal' },
-  { label: 'Prediabetes (5.7–6.4%)', min: 5.7, max: 6.5, severity: 'attention' },
+  { label: 'Pré-diabetes (5.7–6.4%)', min: 5.7, max: 6.5, severity: 'attention' },
   { label: 'Diabetes (≥ 6.5%)', min: 6.5, severity: 'critical' },
 ]
 
 export const T2DM_TARGET_REFERENCES: ReferenceRange[] = [
-  { label: 'On target (< 7%)', max: 7, severity: 'normal' },
-  { label: 'Near target (7–8%)', min: 7, max: 8, severity: 'attention' },
-  { label: 'Off target (> 8%)', min: 8, severity: 'critical' },
+  { label: 'No alvo (< 7%)', max: 7, severity: 'normal' },
+  { label: 'Próximo do alvo (7–8%)', min: 7, max: 8, severity: 'attention' },
+  { label: 'Fora do alvo (> 8%)', min: 8, severity: 'critical' },
 ]
 
 /**
@@ -64,7 +64,7 @@ export function calculateHba1c(input: Hba1cInput): CalcResult {
     hba1cPercent < 5.7
       ? 'Normal'
       : hba1cPercent < 6.5
-        ? 'Prediabetes'
+        ? 'Pré-diabetes'
         : 'Diabetes'
 
   const targetSeverity =
@@ -75,38 +75,38 @@ export function calculateHba1c(input: Hba1cInput): CalcResult {
         : 'critical'
   const targetStatus =
     hba1cPercent < T2DM_TARGET_PERCENT
-      ? 'On target'
+      ? 'No alvo'
       : hba1cPercent <= 8
-        ? 'Near target'
-        : 'Off target'
+        ? 'Próximo do alvo'
+        : 'Fora do alvo'
 
   return {
     label: 'HbA1c',
     value: hba1cPercent,
     unit: '%',
     severity,
-    interpretation: `HbA1c ${hba1cPercent}% — ${classification}. Diabetes is diagnosed at 6.5% or above; prediabetes spans 5.7 to 6.4%.`,
+    interpretation: `HbA1c ${hba1cPercent}% — ${classification}. O diabetes é diagnosticado em 6.5% ou mais; o pré-diabetes abrange de 5.7 a 6.4%.`,
     references: HBA1C_REFERENCES,
     subResults: [
       {
-        label: 'Estimated Average Glucose',
+        label: 'Glicose Média Estimada',
         value: round(ADAG_EAG_MGDL(hba1cPercent), 0),
         unit: 'mg/dL',
         severity: 'info',
-        interpretation: `ADAG regression: (${hba1cPercent} × 28.7) − 46.7.`,
+        interpretation: `Regressão ADAG: (${hba1cPercent} × 28.7) − 46.7.`,
       },
       {
-        label: 'Estimated Average Glucose',
+        label: 'Glicose Média Estimada',
         value: round(ADAG_EAG_MMOL(hba1cPercent), 1),
         unit: 'mmol/L',
         severity: 'info',
-        interpretation: `ADAG regression: (${hba1cPercent} × 1.59) − 2.59.`,
+        interpretation: `Regressão ADAG: (${hba1cPercent} × 1.59) − 2.59.`,
       },
       {
-        label: 'Type 2 Diabetes Target',
+        label: 'Alvo para diabetes tipo 2',
         value: targetStatus,
         severity: targetSeverity,
-        interpretation: `General treatment target is HbA1c below ${T2DM_TARGET_PERCENT}%; individualise for age, comorbidity and hypoglycaemia risk.`,
+        interpretation: `O alvo geral de tratamento é HbA1c abaixo de ${T2DM_TARGET_PERCENT}%; individualizar conforme idade, comorbidades e risco de hipoglicemia.`,
       },
     ],
   }

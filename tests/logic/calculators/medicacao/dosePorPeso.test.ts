@@ -13,7 +13,7 @@ const base = {
 describe('calculateDoseByWeight', () => {
   it('converts 15 mg/kg × 20 kg into 6 mL at 50 mg/mL', () => {
     const result = calculateDoseByWeight(base)
-    expect(result.label).toBe('Required Dose')
+    expect(result.label).toBe('Dose necessária')
     expect(result.value).toBe(6)
     expect(result.unit).toBe('mL')
     expect(result.severity).toBe('info')
@@ -23,17 +23,17 @@ describe('calculateDoseByWeight', () => {
 
   it('exposes the total dose as a sub-result', () => {
     const result = calculateDoseByWeight(base)
-    const dose = result.subResults?.find(sub => sub.label === 'Total Dose')
+    const dose = result.subResults?.find(sub => sub.label === 'Dose total')
     expect(dose?.value).toBe(300)
     expect(dose?.unit).toBe('mg')
   })
 
   it('derives the base unit from the denominator', () => {
     const mcg = calculateDoseByWeight({ ...base, unitDoseUnit: 'mcg/kg', unitDose: 0.5 })
-    expect(mcg.subResults?.find(sub => sub.label === 'Total Dose')?.unit).toBe('mcg')
+    expect(mcg.subResults?.find(sub => sub.label === 'Dose total')?.unit).toBe('mcg')
 
     const iu = calculateDoseByWeight({ ...base, unitDoseUnit: 'IU/kg', unitDose: 50 })
-    expect(iu.subResults?.find(sub => sub.label === 'Total Dose')?.unit).toBe('IU')
+    expect(iu.subResults?.find(sub => sub.label === 'Dose total')?.unit).toBe('IU')
   })
 
   it('rounds international units to whole numbers', () => {
@@ -42,14 +42,14 @@ describe('calculateDoseByWeight', () => {
       unitDoseUnit: 'IU/kg',
       unitDose: 10.5,
     })
-    expect(result.subResults?.find(sub => sub.label === 'Total Dose')?.value).toBe(210)
+    expect(result.subResults?.find(sub => sub.label === 'Dose total')?.value).toBe(210)
   })
 
   it('escalates to critical when the required volume exceeds the presentation', () => {
     const result = calculateDoseByWeight({ ...base, availableVolumeMl: 4 })
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('only 4 mL is available')
-    expect(result.subResults?.find(sub => sub.label === 'Volume Available')?.severity).toBe(
+    expect(result.interpretation).toContain('apenas 4 mL disponíveis')
+    expect(result.subResults?.find(sub => sub.label === 'Volume disponível')?.severity).toBe(
       'critical',
     )
   })

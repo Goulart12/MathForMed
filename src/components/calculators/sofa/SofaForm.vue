@@ -3,8 +3,7 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import type { SofaInput } from '@/types/calculator-inputs'
-
+import type { SofaInput } from '@/logic/calculators/emergencia/sofa'
 const emit = defineEmits<{ calculate: [input: SofaInput] }>()
 
 /** Each organ is collected as its published 0–4 band, already resolved. */
@@ -70,13 +69,15 @@ const isValid = computed(() => all.every((ref) => ref.value !== '' && Number(ref
 
 function handleSubmit() {
   if (!isValid.value) return
+  // The <select> only offers 0–4, which is exactly the `SofaScore` union.
+  const score = (value: string | number) => Number(value) as SofaInput['respirationScore']
   emit('calculate', {
-    respirationScore: Number(respirationScore.value),
-    coagulationScore: Number(coagulationScore.value),
-    liverScore: Number(liverScore.value),
-    cardiovascularScore: Number(cardiovascularScore.value),
-    cnsScore: Number(cnsScore.value),
-    renalScore: Number(renalScore.value),
+    respirationScore: score(respirationScore.value),
+    coagulationScore: score(coagulationScore.value),
+    liverScore: score(liverScore.value),
+    cardiovascularScore: score(cardiovascularScore.value),
+    cnsScore: score(cnsScore.value),
+    renalScore: score(renalScore.value),
   })
 }
 </script>

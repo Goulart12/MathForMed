@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { OsmolalidadeInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: OsmolalidadeInput] }>()
+import type { OsmolalityInput } from '@/logic/calculators/laboratorial/osmolalidade'
+const emit = defineEmits<{ calculate: [input: OsmolalityInput] }>()
 
 const sodium = ref<number | null>(null)
 const glucoseMgDl = ref<number | null>(null)

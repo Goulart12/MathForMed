@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { PhCaretRight, PhStar } from '@phosphor-icons/vue'
-import type { CalculatorMeta } from '@/types/logic'
+import type { CalculatorMeta } from '@/logic/types'
 import { EVIDENCE_TONES } from '@/data/severity'
 
 defineProps<{

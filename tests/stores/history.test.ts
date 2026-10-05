@@ -5,16 +5,16 @@ import { HISTORY_KEY, MAX_ENTRIES, useHistoryStore } from '@/stores/history'
 import { resetLocalStorage } from './helpers'
 
 const result: CalcResult = {
-  label: 'Body Mass Index',
+  label: 'Índice de Massa Corporal',
   value: 22.1,
   unit: 'kg/m²',
   severity: 'normal',
-  interpretation: 'BMI 22.1 kg/m² — Normal weight.',
+  interpretation: 'IMC 22.1 kg/m² — Peso normal.',
 }
 
 const entry = (calculatorId = 'imc') => ({
   calculatorId,
-  calculatorName: 'Body Mass Index (BMI)',
+  calculatorName: 'Índice de Massa Corporal (IMC)',
   result,
   inputs: { weightKg: 70, heightM: 1.78 },
 })
@@ -38,7 +38,7 @@ describe('useHistoryStore', () => {
     expect(store.count).toBe(1)
     expect(stored.id).toMatch(/^[0-9a-f-]{36}$/)
     expect(new Date(stored.timestamp).toISOString()).toBe(stored.timestamp)
-    expect(store.entries[0].calculatorId).toBe('imc')
+    expect(store.entries[0]?.calculatorId).toBe('imc')
   })
 
   it('keeps the newest entry first', () => {
@@ -65,7 +65,7 @@ describe('useHistoryStore', () => {
 
     expect(store.count).toBe(MAX_ENTRIES)
     // The ten oldest were dropped.
-    expect(store.entries[0].calculatorId).toBe(`calc-${MAX_ENTRIES + 9}`)
+    expect(store.entries[0]?.calculatorId).toBe(`calc-${MAX_ENTRIES + 9}`)
     expect(store.entries.at(-1)?.calculatorId).toBe('calc-10')
   })
 
@@ -86,7 +86,7 @@ describe('useHistoryStore', () => {
 
     const store = useHistoryStore()
     expect(store.count).toBe(1)
-    expect(store.entries[0].id).toBe('x')
+    expect(store.entries[0]?.id).toBe('x')
   })
 
   it('falls back to an empty list when the stored value is corrupt', () => {
@@ -113,7 +113,7 @@ describe('useHistoryStore', () => {
 
     store.remove(first.id)
     expect(store.count).toBe(1)
-    expect(store.entries[0].calculatorId).toBe('qsofa')
+    expect(store.entries[0]?.calculatorId).toBe('qsofa')
     expect(JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')).toHaveLength(1)
   })
 
@@ -135,7 +135,7 @@ describe('useHistoryStore', () => {
   it('preserves the full result object', () => {
     const store = useHistoryStore()
     store.add(entry())
-    expect(store.entries[0].result).toEqual(result)
-    expect(store.entries[0].inputs).toEqual({ weightKg: 70, heightM: 1.78 })
+    expect(store.entries[0]?.result).toEqual(result)
+    expect(store.entries[0]?.inputs).toEqual({ weightKg: 70, heightM: 1.78 })
   })
 })

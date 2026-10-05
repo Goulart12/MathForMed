@@ -1,4 +1,4 @@
-import type { Severity } from '@/types/logic'
+import type { Severity } from '@/logic/types'
 
 export interface SeverityTone {
   /** Badge text — the spec'd uppercase vocabulary. */

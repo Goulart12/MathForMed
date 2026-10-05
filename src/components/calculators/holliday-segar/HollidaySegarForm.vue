@@ -2,8 +2,7 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { HollidaySegarInput } from '@/types/calculator-inputs'
-
+import type { HollidaySegarInput } from '@/logic/calculators/nutricao/hollidaySegar'
 const emit = defineEmits<{ calculate: [input: HollidaySegarInput] }>()
 
 const weightKg = ref<number | null>(null)

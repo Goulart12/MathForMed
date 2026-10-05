@@ -44,7 +44,7 @@ export function calculateMdrd(input: MdrdInput): CalcResult {
   const { age, serumCreatinineMgDl, sex } = input
 
   assertOneOf(sex, SEXES, 'sex')
-  assertRange(age, 1, 120, 'age', 'years')
+  assertRange(age, 1, 120, 'age', 'anos')
   assertRange(serumCreatinineMgDl, 0.1, 50, 'serumCreatinineMgDl', 'mg/dL')
 
   const raw = 175 * serumCreatinineMgDl ** -1.154 * age ** -0.203
@@ -54,15 +54,15 @@ export function calculateMdrd(input: MdrdInput): CalcResult {
   const severity: Severity = stage.severity
 
   return {
-    label: 'eGFR (MDRD)',
+    label: 'TFGe (MDRD)',
     value: rounded,
     unit: 'mL/min/1.73 m²',
     severity,
-    interpretation: `eGFR ${rounded} mL/min/1.73 m² — KDIGO ${stage.stage} (${stage.label.replace(/^G\d[ab]?\s—\s/, '')}). The four-variable MDRD equation is less accurate than CKD-EPI 2021 above 90 mL/min/1.73 m².`,
+    interpretation: `TFGe ${rounded} mL/min/1.73 m² — KDIGO ${stage.stage} (${stage.label.replace(/^G\d[ab]?\s—\s/, '')}). A equação MDRD de quatro variáveis é menos acurada que a CKD-EPI 2021 acima de 90 mL/min/1.73 m².`,
     references: KDIGO_REFERENCES,
     subResults: [
       {
-        label: 'KDIGO Stage',
+        label: 'Estágio KDIGO',
         value: stage.stage,
         severity,
         interpretation: stage.label,

@@ -27,12 +27,22 @@ const SEXES: readonly ('M' | 'F')[] = ['M', 'F']
 export const FEMALE_FACTOR = 0.85
 
 export const CRCL_REFERENCES: ReferenceRange[] = [
-  { label: 'Normal renal function (≥ 90 mL/min)', min: 90, severity: 'normal' },
-  { label: 'Mildly decreased (60–89 mL/min)', min: 60, max: 89, severity: 'normal' },
-  { label: 'Mildly-to-moderately decreased (45–59)', min: 45, max: 59, severity: 'attention' },
-  { label: 'Moderately-to-severely decreased (30–44)', min: 30, max: 44, severity: 'attention' },
-  { label: 'Severely decreased (15–29 mL/min)', min: 15, max: 29, severity: 'critical' },
-  { label: 'Kidney failure (< 15 mL/min)', max: 14.9, severity: 'critical' },
+  { label: 'Função renal normal (≥ 90 mL/min)', min: 90, severity: 'normal' },
+  { label: 'Ligeiramente reduzida (60–89 mL/min)', min: 60, max: 89, severity: 'normal' },
+  {
+    label: 'Ligeiramente a moderadamente reduzida (45–59)',
+    min: 45,
+    max: 59,
+    severity: 'attention',
+  },
+  {
+    label: 'Moderadamente a severamente reduzida (30–44)',
+    min: 30,
+    max: 44,
+    severity: 'attention',
+  },
+  { label: 'Severamente reduzida (15–29 mL/min)', min: 15, max: 29, severity: 'critical' },
+  { label: 'Falência renal (< 15 mL/min)', max: 14.9, severity: 'critical' },
 ]
 
 /**
@@ -61,7 +71,7 @@ export function calculateCreatinineClearance(
   const { age, weightKg, serumCreatinineMgDl, sex } = input
 
   assertOneOf(sex, SEXES, 'sex')
-  assertRange(age, 1, 120, 'age', 'years')
+  assertRange(age, 1, 120, 'age', 'anos')
   assertRange(weightKg, 0.5, 300, 'weightKg', 'kg')
   assertRange(serumCreatinineMgDl, 0.1, 50, 'serumCreatinineMgDl', 'mg/dL')
 
@@ -73,32 +83,32 @@ export function calculateCreatinineClearance(
   const severity: Severity = stage.severity
 
   return {
-    label: 'Creatinine Clearance',
+    label: 'Depuração de Creatinina',
     value: rounded,
     unit: 'mL/min',
     severity,
     interpretation: `CrCl ${rounded} mL/min — KDIGO ${stage.stage} (${stage.label.replace(/^G\d[ab]?\s—\s/, '')}).${
       crCl < 60
-        ? ' Renal function is reduced; renally cleared drugs usually require dose adjustment or interval extension.'
-        : ' Renal function is preserved.'
+        ? ' A função renal está reduzida; fármacos de eliminação renal normalmente exigem ajuste de dose ou aumento do intervalo de administração.'
+        : ' A função renal está preservada.'
     }`,
     references: CRCL_REFERENCES,
     subResults: [
       {
-        label: 'KDIGO Stage',
+        label: 'Estágio KDIGO',
         value: stage.stage,
         severity,
         interpretation: stage.label,
       },
       {
-        label: 'Sex Factor',
+        label: 'Fator por sexo',
         value: sex === 'F' ? FEMALE_FACTOR : 1,
         unit: '×',
         severity: 'info',
         interpretation:
           sex === 'F'
-            ? 'Female estimates are multiplied by 0.85.'
-            : 'No sex factor applied to the male estimate.',
+            ? 'As estimativas para o sexo feminino são multiplicadas por 0.85.'
+            : 'Nenhum fator por sexo é aplicado à estimativa masculina.',
       },
     ],
   }

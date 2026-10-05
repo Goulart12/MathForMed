@@ -54,7 +54,7 @@ export function calculateCkdEpi(input: CkdEpiInput): CalcResult {
   const { age, serumCreatinineMgDl, sex } = input
 
   assertOneOf(sex, SEXES, 'sex')
-  assertRange(age, 1, 120, 'age', 'years')
+  assertRange(age, 1, 120, 'age', 'anos')
   assertRange(serumCreatinineMgDl, 0.1, 50, 'serumCreatinineMgDl', 'mg/dL')
 
   const kappa = CKD_EPI_KAPPA[sex]
@@ -73,29 +73,29 @@ export function calculateCkdEpi(input: CkdEpiInput): CalcResult {
   const severity: Severity = stage.severity
 
   return {
-    label: 'eGFR (CKD-EPI 2021)',
+    label: 'TFGe (CKD-EPI 2021)',
     value: rounded,
     unit: 'mL/min/1.73 m²',
     severity,
-    interpretation: `eGFR ${rounded} mL/min/1.73 m² — KDIGO ${stage.stage} (${stage.label.replace(/^G\d[ab]?\s—\s/, '')}).${
+    interpretation: `TFGe ${rounded} mL/min/1.73 m² — KDIGO ${stage.stage} (${stage.label.replace(/^G\d[ab]?\s—\s/, '')}).${
       gfr < 60
-        ? ' Values below 60 mL/min/1.73 m² sustained for 3 months define CKD.'
-        : ' Values at or above 60 mL/min/1.73 m² are not, on their own, diagnostic of CKD.'
+        ? ' Valores abaixo de 60 mL/min/1.73 m² mantidos por 3 meses definem CKD.'
+        : ' Valores iguais ou superiores a 60 mL/min/1.73 m² não são, por si só, diagnósticos de CKD.'
     }`,
     references: KDIGO_REFERENCES,
     subResults: [
       {
-        label: 'KDIGO Stage',
+        label: 'Estágio KDIGO',
         value: stage.stage,
         severity,
         interpretation: stage.label,
       },
       {
-        label: 'Equation',
+        label: 'Fórmula',
         value: 'CKD-EPI 2021',
         severity: 'info',
         interpretation:
-          'Race-neutral 2021 revision; the 2009 race coefficients were removed from the equation.',
+          'Revisão de 2021 neutra em relação à raça; os coeficientes raciais de 2009 foram removidos da fórmula.',
       },
     ],
   }

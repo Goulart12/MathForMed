@@ -3,9 +3,8 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
-import type { SuperficieCorporalInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: SuperficieCorporalInput] }>()
+import type { BsaInput } from '@/logic/calculators/antropometria/superficieCorporal'
+const emit = defineEmits<{ calculate: [input: BsaInput] }>()
 
 const weightKg = ref<number | null>(null)
 const heightCm = ref<number | null>(null)

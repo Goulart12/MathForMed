@@ -23,9 +23,9 @@ export const SODIUM_CORRECTION_FACTOR = 1.6
 export const GLUCOSE_REFERENCE = 100
 
 export const CORRECTED_SODIUM_REFERENCES: ReferenceRange[] = [
-  { label: 'Hyponatraemia (< 135 mEq/L)', max: 135, severity: 'attention' },
+  { label: 'Hiponatremia (< 135 mEq/L)', max: 135, severity: 'attention' },
   { label: 'Normal (135–145 mEq/L)', min: 135, max: 145, severity: 'normal' },
-  { label: 'Hypernatraemia (> 145 mEq/L)', min: 145, severity: 'critical' },
+  { label: 'Hipernatremia (> 145 mEq/L)', min: 145, severity: 'critical' },
 ]
 
 /**
@@ -56,25 +56,25 @@ export function calculateCorrectedSodium(input: CorrectedSodiumInput): CalcResul
 
   const severity = rounded < 135 ? 'attention' : rounded > 145 ? 'critical' : 'normal'
   const classification =
-    rounded < 135 ? 'Hyponatraemia' : rounded > 145 ? 'Hypernatraemia' : 'Normal sodium'
+    rounded < 135 ? 'Hiponatremia' : rounded > 145 ? 'Hipernatremia' : 'Sódio normal'
 
   return {
-    label: 'Corrected Sodium',
+    label: 'Sódio corrigido',
     value: rounded,
     unit: 'mEq/L',
     severity,
-    interpretation: `Corrected sodium ${rounded} mEq/L — ${classification}, against a reference of 135 to 145 mEq/L. The measured value of ${measuredSodiumMeqL} mEq/L is diluted by hyperglycaemia; the correction adds ${round(SODIUM_CORRECTION_FACTOR * ((glucoseMgDl - GLUCOSE_REFERENCE) / 100), 1)} mEq/L.`,
+    interpretation: `Sódio corrigido ${rounded} mEq/L — ${classification}, contra uma referência de 135 a 145 mEq/L. O valor medido de ${measuredSodiumMeqL} mEq/L está diluído pela hiperglicemia; a correção adiciona ${round(SODIUM_CORRECTION_FACTOR * ((glucoseMgDl - GLUCOSE_REFERENCE) / 100), 1)} mEq/L.`,
     references: CORRECTED_SODIUM_REFERENCES,
     subResults: [
       {
-        label: 'Measured Sodium',
+        label: 'Sódio medido',
         value: measuredSodiumMeqL,
         unit: 'mEq/L',
         severity: 'info',
-        interpretation: `Sodium reported by the laboratory at a glucose of ${glucoseMgDl} mg/dL.`,
+        interpretation: `Sódio informado pelo laboratório com glicose de ${glucoseMgDl} mg/dL.`,
       },
       {
-        label: 'Correction Applied',
+        label: 'Correção aplicada',
         value: round(corrected - measuredSodiumMeqL, 1),
         unit: 'mEq/L',
         severity: 'info',

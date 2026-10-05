@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { CorrecaoSodioInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: CorrecaoSodioInput] }>()
+import type { CorrectedSodiumInput } from '@/logic/calculators/laboratorial/correcaoSodio'
+const emit = defineEmits<{ calculate: [input: CorrectedSodiumInput] }>()
 
 const measuredSodiumMeqL = ref<number | null>(null)
 const glucoseMgDl = ref<number | null>(null)

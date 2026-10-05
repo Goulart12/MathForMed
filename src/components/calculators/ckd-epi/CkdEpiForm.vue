@@ -3,8 +3,7 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
-import type { CkdEpiInput } from '@/types/calculator-inputs'
-
+import type { CkdEpiInput } from '@/logic/calculators/renal/tfgCkdEpi'
 const emit = defineEmits<{ calculate: [input: CkdEpiInput] }>()
 
 const age = ref<number | null>(null)

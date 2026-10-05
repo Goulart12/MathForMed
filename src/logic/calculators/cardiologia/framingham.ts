@@ -10,7 +10,8 @@
  */
 
 import type { CalcResult, ReferenceRange, Severity } from '../../types'
-import { assertOneOf, assertRange } from '../../utils/validators'
+import { assertDefined, assertOneOf, assertRange } from '../../utils/validators'
+import { pluralize } from '../../utils/units'
 
 /** Inputs for {@link calculateFramingham}. */
 export interface FraminghamInput {
@@ -36,6 +37,30 @@ const SEXES: readonly ('M' | 'F')[] = ['M', 'F']
 
 /** Age columns used by the cholesterol and smoking tables: 20–39 … 70–79. */
 type AgeColumn = 0 | 1 | 2 | 3 | 4
+
+/** One row of the total-cholesterol table, holding a point value per age column. */
+type AgeColumnPoints = readonly [number, number, number, number, number]
+
+/** The five total-cholesterol rows, indexed by {@link CholesterolRow}. */
+type CholesterolTable = readonly [
+  AgeColumnPoints,
+  AgeColumnPoints,
+  AgeColumnPoints,
+  AgeColumnPoints,
+  AgeColumnPoints,
+]
+
+/** Index of a total-cholesterol row: <160, 160–199, 200–239, 240–279, ≥280 mg/dL. */
+type CholesterolRow = 0 | 1 | 2 | 3 | 4
+
+/** Index of the four HDL bands: <40, 40–49, 50–59, ≥60 mg/dL. */
+type HdlBand = 0 | 1 | 2 | 3
+
+/**
+ * Index of the five systolic blood pressure bands:
+ * <120, 120–129, 130–139, 140–159, ≥160 mmHg.
+ */
+type SbpBand = 0 | 1 | 2 | 3 | 4
 
 /**
  * Age at the start of each column band, indexed by {@link AgeColumn}.
@@ -67,7 +92,7 @@ const SATURATION_POINTS = { M: 17, F: 25 } as const
  * Total cholesterol points, indexed by row then age column.
  * Rows: <160, 160–199, 200–239, 240–279, ≥280 mg/dL.
  */
-const TOTAL_CHOLESTEROL_POINTS: Record<'M' | 'F', readonly (readonly number[])[]> = {
+const TOTAL_CHOLESTEROL_POINTS: Record<'M' | 'F', CholesterolTable> = {
   M: [
     [0, 0, 0, 0, 0],
     [4, 3, 2, 1, 0],
@@ -85,7 +110,7 @@ const TOTAL_CHOLESTEROL_POINTS: Record<'M' | 'F', readonly (readonly number[])[]
 }
 
 /** Smoking points for current smokers, indexed by age column. */
-const SMOKER_POINTS: Record<'M' | 'F', readonly number[]> = {
+const SMOKER_POINTS: Record<'M' | 'F', AgeColumnPoints> = {
   M: [8, 5, 3, 1, 1],
   F: [9, 7, 4, 2, 1],
 }
@@ -112,7 +137,7 @@ const SBP_POINTS: Record<
 }
 
 /** Index into the five systolic blood pressure bands. */
-function sbpBand(sysBpMmhg: number): number {
+function sbpBand(sysBpMmhg: number): SbpBand {
   if (sysBpMmhg < 120) return 0
   if (sysBpMmhg < 130) return 1
   if (sysBpMmhg < 140) return 2
@@ -121,7 +146,7 @@ function sbpBand(sysBpMmhg: number): number {
 }
 
 /** Index into the four HDL bands. */
-function hdlBand(hdlCholesterolMgDl: number): number {
+function hdlBand(hdlCholesterolMgDl: number): HdlBand {
   if (hdlCholesterolMgDl < 40) return 0
   if (hdlCholesterolMgDl < 50) return 1
   if (hdlCholesterolMgDl < 60) return 2
@@ -142,9 +167,9 @@ const RISK_BY_POINT: Record<'M' | 'F', readonly number[]> = {
 const BELOW_ONE_AT: Record<'M' | 'F', number> = { M: 0, F: 9 }
 
 export const FRAMINGHAM_REFERENCES: ReferenceRange[] = [
-  { label: 'Low risk (< 10%)', max: 9.9, severity: 'normal' },
-  { label: 'Moderate risk (10–20%)', min: 10, max: 20, severity: 'attention' },
-  { label: 'High risk (> 20%)', min: 20.1, severity: 'critical' },
+  { label: 'Baixo risco (< 10%)', max: 9.9, severity: 'normal' },
+  { label: 'Risco moderado (10–20%)', min: 10, max: 20, severity: 'attention' },
+  { label: 'Alto risco (> 20%)', min: 20.1, severity: 'critical' },
 ]
 
 /** One point-contributing risk factor. */
@@ -177,18 +202,20 @@ function agePoints(age: number, sex: 'M' | 'F'): number {
   // Beyond the published range (age ≥ 80) the score keeps rising one point per
   // year until the risk table saturates.
   const saturated = SATURATION_POINTS[sex]
-  return Math.min(AGE_BANDS[AGE_BANDS.length - 1].points[sex] + (age - PUBLISHED_MAX_AGE), saturated)
+  const highestBand = AGE_BANDS[AGE_BANDS.length - 1]
+  assertDefined(highestBand, 'the published age bands')
+  return Math.min(highestBand.points[sex] + (age - PUBLISHED_MAX_AGE), saturated)
 }
 
 function ageColumn(age: number): AgeColumn {
-  let column = 0
-  for (let index = 0; index < AGE_COLUMN_STARTS.length; index += 1) {
-    if (age >= AGE_COLUMN_STARTS[index]) column = index
+  let column: AgeColumn = 0
+  for (const [index, start] of AGE_COLUMN_STARTS.entries()) {
+    if (age >= start) column = index as AgeColumn
   }
-  return column as AgeColumn
+  return column
 }
 
-function cholesterolRow(totalCholesterolMgDl: number): number {
+function cholesterolRow(totalCholesterolMgDl: number): CholesterolRow {
   if (totalCholesterolMgDl < 160) return 0
   if (totalCholesterolMgDl < 200) return 1
   if (totalCholesterolMgDl < 240) return 2
@@ -219,7 +246,7 @@ export function framinghamBreakdown(input: FraminghamInput): FraminghamBreakdown
   } = input
 
   assertOneOf(sex, SEXES, 'sex')
-  assertRange(age, 20, 120, 'age', 'years')
+  assertRange(age, 20, 120, 'age', 'anos')
   assertRange(totalCholesterolMgDl, 100, 600, 'totalCholesterolMgDl', 'mg/dL')
   assertRange(hdlCholesterolMgDl, 10, 150, 'hdlCholesterolMgDl', 'mg/dL')
   assertRange(sysBpMmhg, 70, 300, 'sysBpMmhg', 'mmHg')
@@ -227,43 +254,47 @@ export function framinghamBreakdown(input: FraminghamInput): FraminghamBreakdown
   const column = ageColumn(age)
 
   const components: FraminghamComponent[] = [
-    { label: 'Age', points: agePoints(age, sex), display: `${age} years` },
+    { label: 'Idade', points: agePoints(age, sex), display: `${age} anos` },
     {
-      label: 'Total cholesterol',
+      label: 'Colesterol total',
       points: TOTAL_CHOLESTEROL_POINTS[sex][cholesterolRow(totalCholesterolMgDl)][column],
       display: `${totalCholesterolMgDl} mg/dL`,
     },
     {
-      label: 'HDL cholesterol',
+      label: 'Colesterol HDL',
       points: HDL_POINTS[hdlBand(hdlCholesterolMgDl)],
       display: `${hdlCholesterolMgDl} mg/dL`,
     },
     {
-      label: `Systolic BP (${bpTreated ? 'treated' : 'untreated'})`,
+      label: `Pressão arterial sistólica (${bpTreated ? 'tratada' : 'não tratada'})`,
       points: SBP_POINTS[sex][bpTreated ? 'treated' : 'untreated'][sbpBand(sysBpMmhg)],
       display: `${sysBpMmhg} mmHg`,
     },
     {
-      label: 'Current smoker',
+      label: 'Fumante atual',
       points: smoker ? SMOKER_POINTS[sex][column] : 0,
-      display: smoker ? 'Yes' : 'No',
+      display: smoker ? 'Sim' : 'Não',
     },
     {
       label: 'Diabetes',
       // Diabetes is not a scored variable in the Wilson 1998 hard-CHD point
       // table; it is reported separately so no point value has to be invented.
       points: 0,
-      display: diabetic ? 'Yes — not scored in this table' : 'No',
+      display: diabetic ? 'Sim — não pontuado nesta tabela' : 'Não',
     },
   ]
 
   const totalPoints = components.reduce((total, component) => total + component.points, 0)
   const riskTable = RISK_BY_POINT[sex]
 
+  // Totals outside the published range clamp to the saturating end of the table.
+  const clampedIndex = Math.min(Math.max(totalPoints, 0), riskTable.length - 1)
+  const riskPercent = riskTable[clampedIndex]
+  assertDefined(riskPercent, `the risk table for sex '${sex}'`)
+
   return {
     totalPoints,
-    // Totals outside the published range clamp to the saturating end of the table.
-    riskPercent: riskTable[Math.min(Math.max(totalPoints, 0), riskTable.length - 1)],
+    riskPercent,
     belowOnePercent: totalPoints < BELOW_ONE_AT[sex],
     components,
   }
@@ -292,41 +323,41 @@ export function calculateFramingham(input: FraminghamInput): CalcResult {
   const severity: Severity =
     riskPercent < 10 ? 'normal' : riskPercent <= 20 ? 'attention' : 'critical'
   const band =
-    riskPercent < 10 ? 'Low' : riskPercent <= 20 ? 'Moderate' : 'High'
+    riskPercent < 10 ? 'Baixo' : riskPercent <= 20 ? 'Moderado' : 'Alto'
 
   const riskText = belowOnePercent ? '< 1' : String(riskPercent)
 
   return {
-    label: '10-year CHD Risk',
+    label: 'Risco de DAC em 10 anos',
     value: riskPercent,
     unit: '%',
     severity,
-    interpretation: `${band} risk — approximately ${riskText}% 10-year risk of hard coronary heart disease (${totalPoints} points).${
+    interpretation: `${band} risco — aproximadamente ${riskText}% de risco de doença arterial coronariana grave em 10 anos (${totalPoints} pontos).${
       input.diabetic
-        ? ' Established diabetes confers high baseline ASCVD risk in its own right: the 2013 ACC/AHA guideline treats adults aged 40–75 with diabetes as a statin-benefit group, so this percentage understates overall risk.'
+        ? ' Diabetes estabelecido confere risco basal elevado de ASCVD por si só: a diretriz ACC/AHA de 2013 considera adultos de 40–75 anos com diabetes como grupo com benefício de estatina, portanto esta porcentagem subestima o risco global.'
         : ''
-    } Wilson 1998 is validated for ages 30–79 and is superseded for primary prevention by the 2013 ACC/AHA pooled-cohort equations.`,
+    } Wilson 1998 é validado para idades de 30–79 anos e foi substituído na prevenção primária pelas equações de coorte agrupada da ACC/AHA de 2013.`,
     references: FRAMINGHAM_REFERENCES,
     subResults: [
       {
-        label: 'Point Total',
+        label: 'Total de pontos',
         value: totalPoints,
-        unit: 'points',
+        unit: pluralize(totalPoints, 'ponto'),
         severity: 'info',
-        interpretation: `Sum of the Framingham point allocations (${components.length} risk factors).`,
+        interpretation: `Soma dos pontos do Framingham (${components.length} fatores de risco).`,
       },
       {
         label: 'Diabetes',
-        value: input.diabetic ? 'Yes' : 'No',
+        value: input.diabetic ? 'Sim' : 'Não',
         severity: input.diabetic ? ('attention' as Severity) : ('info' as Severity),
         interpretation: input.diabetic
-          ? 'Diabetes is not a scored variable in the Wilson 1998 hard-CHD point table; treat this result as an underestimate of total ASCVD risk.'
-          : 'No diabetes. Diabetes is not a scored variable in the Wilson 1998 hard-CHD point table.',
+          ? 'Diabetes não é uma variável pontuada na tabela de pontos de DAC grave de Wilson 1998; considere este resultado como uma subestimativa do risco total de ASCVD.'
+          : 'Sem diabetes. Diabetes não é uma variável pontuada na tabela de pontos de DAC grave de Wilson 1998.',
       },
       ...components.map(component => ({
         label: component.label,
         value: component.points,
-        unit: 'points',
+        unit: pluralize(component.points, 'ponto'),
         severity: 'info' as const,
         interpretation: component.display,
       })),

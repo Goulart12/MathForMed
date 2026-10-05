@@ -5,7 +5,7 @@ import { PhStar } from '@phosphor-icons/vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import CalculatorListItem from '@/components/ui/CalculatorListItem.vue'
 import { CALCULATORS_META } from '@/data/calculator-meta'
-import { useFavoritesStore } from '@/composables/useFavorites'
+import { useFavoritesStore } from '@/stores/favorites'
 
 const favorites = useFavoritesStore()
 

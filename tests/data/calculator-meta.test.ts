@@ -12,7 +12,7 @@ import {
 } from '@/data/calculator-meta'
 import { CATEGORIES } from '@/data/categories'
 import { CALCULATOR_REGISTRY } from '@/components/calculators/registry'
-import type { CalcCategory } from '@/types/logic'
+import type { CalcCategory } from '@/logic/types'
 
 const VALID_CATEGORIES = new Set<string>(CATEGORIES.map((c) => c.slug))
 

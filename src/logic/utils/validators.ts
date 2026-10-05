@@ -35,7 +35,7 @@ export function assertRange(
   if (value < min || value > max) {
     throw new CalcValidationError(
       field,
-      `Field '${field}' must be between ${min} and ${max} ${unit}. Received: ${value}`,
+      `O campo '${field}' deve estar entre ${min} e ${max} ${unit}. Recebido: ${value}`,
     )
   }
 }
@@ -53,7 +53,7 @@ export function assertFinite(value: number, field: string, unit = ''): void {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     throw new CalcValidationError(
       field,
-      `Field '${field}' must be a finite number${unit ? ` in ${unit}` : ''}. Received: ${String(value)}`,
+      `O campo '${field}' deve ser um número finito${unit ? ` em ${unit}` : ''}. Recebido: ${String(value)}`,
     )
   }
 }
@@ -81,7 +81,7 @@ export function assertPositive(
   if (value <= min) {
     throw new CalcValidationError(
       field,
-      `Field '${field}' must be greater than ${min}${unit ? ` ${unit}` : ''}. Received: ${value}`,
+      `O campo '${field}' deve ser maior que ${min}${unit ? ` ${unit}` : ''}. Recebido: ${value}`,
     )
   }
 }
@@ -102,7 +102,7 @@ export function assertOneOf<T extends string | number>(
   if (!allowed.includes(value)) {
     throw new CalcValidationError(
       field,
-      `Field '${field}' must be one of: ${allowed.join(', ')}. Received: ${String(value)}`,
+      `O campo '${field}' deve ser um destes: ${allowed.join(', ')}. Recebido: ${String(value)}`,
     )
   }
 }
@@ -118,7 +118,7 @@ export function assertOneOf<T extends string | number>(
  */
 export function assertDefined<T>(value: T, field: string): asserts value is NonNullable<T> {
   if (value === null || value === undefined) {
-    throw new CalcValidationError(field, `Field '${field}' is required.`)
+    throw new CalcValidationError(field, `O campo '${field}' é obrigatório.`)
   }
 }
 

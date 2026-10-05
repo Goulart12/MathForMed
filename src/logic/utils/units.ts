@@ -95,3 +95,19 @@ export const truncate = (value: number, decimals = 1): number => {
   const factor = 10 ** decimals
   return Math.trunc(value * factor) / factor
 }
+
+/**
+ * Agrees a counted unit with its number, so a score reads `1 ponto` rather than
+ * `1 pontos`. Zero and everything above one take the plural.
+ *
+ * @param value - Number the unit describes.
+ * @param singular - Singular form, e.g. `ponto`.
+ * @param plural - Plural form. Defaults to the singular plus `s`.
+ * @returns The form that agrees with `value`.
+ *
+ * @example
+ * pluralize(1, 'ponto') // 'ponto'
+ * pluralize(0, 'ponto') // 'pontos'
+ */
+export const pluralize = (value: number, singular: string, plural = `${singular}s`): string =>
+  Math.abs(value) === 1 ? singular : plural

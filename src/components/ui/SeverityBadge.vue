@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { PhWarning, PhCheckCircle, PhInfo } from '@phosphor-icons/vue'
 import { severityTone } from '@/data/severity'
-import type { Severity } from '@/types/logic'
+import type { Severity } from '@/logic/types'
 
 const props = withDefaults(
   defineProps<{

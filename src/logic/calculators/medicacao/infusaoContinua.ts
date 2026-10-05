@@ -47,25 +47,25 @@ export function calculateInfusionRate(input: ContinuousInfusionInput): CalcResul
   const dailyDoseMcg = doseMcgKgMin * weightKg * 60 * 24
 
   return {
-    label: 'Infusion Rate',
+    label: 'Taxa de infusão',
     value: round(rateMlH, 1),
     unit: 'mL/h',
     severity: 'info',
-    interpretation: `Set the pump at ${round(rateMlH, 1)} mL/h to deliver ${doseMcgKgMin} mcg/kg/min to a ${weightKg} kg patient (${round(dailyDoseMcg / 1000, 1)} mg/day).`,
+    interpretation: `Ajuste a bomba em ${round(rateMlH, 1)} mL/h para administrar ${doseMcgKgMin} mcg/kg/min a um paciente de ${weightKg} kg (${round(dailyDoseMcg / 1000, 1)} mg/dia).`,
     subResults: [
       {
-        label: 'Daily Dose',
+        label: 'Dose diária',
         value: round(dailyDoseMcg / 1000, 2),
-        unit: 'mg/day',
+        unit: 'mg/dia',
         severity: 'info',
-        interpretation: `${doseMcgKgMin} mcg/kg/min × ${weightKg} kg × 1440 min = ${round(dailyDoseMcg / 1000, 2)} mg/day.`,
+        interpretation: `${doseMcgKgMin} mcg/kg/min × ${weightKg} kg × 1440 min = ${round(dailyDoseMcg / 1000, 2)} mg/dia.`,
       },
       {
-        label: 'Dose per Minute',
+        label: 'Dose por minuto',
         value: round(doseMcgKgMin * weightKg, 2),
         unit: 'mcg/min',
         severity: 'info',
-        interpretation: `Absolute dose delivered each minute.`,
+        interpretation: `Dose absoluta administrada a cada minuto.`,
       },
     ],
   }

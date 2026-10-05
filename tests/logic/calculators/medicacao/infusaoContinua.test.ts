@@ -9,7 +9,7 @@ describe('calculateInfusionRate', () => {
       weightKg: 70,
       concentrationMcgMl: 1600,
     })
-    expect(result.label).toBe('Infusion Rate')
+    expect(result.label).toBe('Taxa de infusão')
     expect(result.value).toBeCloseTo(0.13, 1)
     expect(result.unit).toBe('mL/h')
     expect(result.severity).toBe('info')
@@ -21,11 +21,11 @@ describe('calculateInfusionRate', () => {
       weightKg: 70,
       concentrationMcgMl: 1000,
     })
-    expect(result.subResults?.find(sub => sub.label === 'Daily Dose')?.value).toBeCloseTo(
+    expect(result.subResults?.find(sub => sub.label === 'Dose diária')?.value).toBeCloseTo(
       100.8,
       1,
     )
-    expect(result.subResults?.find(sub => sub.label === 'Dose per Minute')?.value).toBe(70)
+    expect(result.subResults?.find(sub => sub.label === 'Dose por minuto')?.value).toBe(70)
   })
 
   it('scales the rate linearly with dose and weight', () => {

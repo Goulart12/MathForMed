@@ -15,10 +15,10 @@ const allAbsent = {
 describe('calculateChadsVasc', () => {
   it('returns a score of 0 and normal risk for a low-risk male', () => {
     const result = calculateChadsVasc(allAbsent)
-    expect(result.label).toBe('CHA₂DS₂-VASc Score')
+    expect(result.label).toBe('Escore CHA₂DS₂-VASc')
     expect(result.value).toBe(0)
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('No anticoagulation recommended')
+    expect(result.interpretation).toContain('Não se recomenda anticoagulação')
   })
 
   it('scores 6 for a 78-year-old female with CHF, hypertension and diabetes', () => {
@@ -34,7 +34,7 @@ describe('calculateChadsVasc', () => {
     // CHF 1 + HTN 1 + age ≥75 2 + DM 1 + female 1 = 6
     expect(result.value).toBe(6)
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('high risk')
+    expect(result.interpretation).toContain('risco alto')
   })
 
   it('awards two points for stroke and two for age ≥ 75', () => {
@@ -57,7 +57,7 @@ describe('calculateChadsVasc', () => {
     const result = calculateChadsVasc({ ...allAbsent, sex: 'F' })
     expect(result.value).toBe(1)
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('does not warrant anticoagulation on its own')
+    expect(result.interpretation).toContain('não justifica anticoagulação isoladamente')
   })
 
   it('uses a higher threshold for females at the same score', () => {
@@ -73,13 +73,13 @@ describe('calculateChadsVasc', () => {
     const result = calculateChadsVasc({ ...allAbsent, vascularDisease: true })
     expect(result.value).toBe(1)
     expect(result.severity).toBe('attention')
-    expect(result.subResults?.map(sub => sub.label)).toEqual(['Vascular disease'])
+    expect(result.subResults?.map(sub => sub.label)).toEqual(['Doença vascular'])
   })
 
   it('lists only the present criteria as sub-results', () => {
     const result = calculateChadsVasc({ ...allAbsent, chf: true, diabetes: true })
     const labels = result.subResults?.map(sub => sub.label)
-    expect(labels).toEqual(['Congestive heart failure', 'Diabetes mellitus'])
+    expect(labels).toEqual(['Insuficiência cardíaca congestiva', 'Diabetes mellitus'])
   })
 
   it('throws CalcValidationError for an unknown sex', () => {

@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { ImcInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: ImcInput] }>()
+import type { BmiInput } from '@/logic/calculators/antropometria/imc'
+const emit = defineEmits<{ calculate: [input: BmiInput] }>()
 
 const weightKg = ref<number | null>(null)
 /** Clinicians measure height in cm; the logic layer works in metres. */
