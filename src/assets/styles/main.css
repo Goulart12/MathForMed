@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@custom-variant hocus (&:hover, &:focus-visible);

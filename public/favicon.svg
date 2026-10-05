@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MedCalc">
+  <rect width="512" height="512" rx="113" fill="#2c6faa" />
+  <g fill="#ffffff">
+    <rect x="194" y="97" width="124" height="318" rx="25" />
+    <rect x="97" y="194" width="318" height="124" rx="25" />
+  </g>
+</svg>
