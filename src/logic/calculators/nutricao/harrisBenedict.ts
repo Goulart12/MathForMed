@@ -40,11 +40,11 @@ export const ACTIVITY_FACTORS: readonly ActivityFactor[] = [
 ]
 
 const ACTIVITY_LABELS: Record<ActivityFactor, string> = {
-  1.2: 'Sedentary (little or no exercise)',
-  1.375: 'Lightly active (1–3 days/week)',
-  1.55: 'Moderately active (3–5 days/week)',
-  1.725: 'Very active (6–7 days/week)',
-  1.9: 'Extra active (physical job or twice daily)',
+  1.2: 'Sedentário (pouco ou nenhum exercício)',
+  1.375: 'Levemente ativo (1–3 dias/semana)',
+  1.55: 'Moderadamente ativo (3–5 dias/semana)',
+  1.725: 'Muito ativo (6–7 dias/semana)',
+  1.9: 'Extra ativo (trabalho físico ou treino duas vezes ao dia)',
 }
 
 /** Default clinical protein target in g/kg/day. */
@@ -52,13 +52,13 @@ export const PROTEIN_G_PER_KG = 1.2
 
 export const ENERGY_REFERENCES: ReferenceRange[] = [
   {
-    label: 'Male BMR — revised Harris-Benedict',
+    label: 'TMB masculino — Harris-Benedict revisada',
     min: 1200,
     max: 2000,
     severity: 'info',
   },
   {
-    label: 'Female BMR — revised Harris-Benedict',
+    label: 'TMB feminino — Harris-Benedict revisada',
     min: 1000,
     max: 1700,
     severity: 'info',
@@ -92,13 +92,13 @@ export function calculateHarrisBenedict(input: HarrisBenedictInput): CalcResult 
   assertOneOf(sex, SEXES, 'sex')
   assertRange(weightKg, 0.5, 300, 'weightKg', 'kg')
   assertRange(heightCm, 50, 250, 'heightCm', 'cm')
-  assertRange(age, 1, 120, 'age', 'years')
+  assertRange(age, 1, 120, 'age', 'anos')
   assertOneOf(activityFactor, ACTIVITY_FACTORS, 'activityFactor')
   assertOptionalFinite(stressFactor, 'stressFactor', '×')
   if (stressFactor < 1) {
     throw new CalcValidationError(
       'stressFactor',
-      `Field 'stressFactor' must be 1 or greater. Received: ${stressFactor}`,
+      `O campo 'stressFactor' deve ser 1 ou maior. Recebido: ${stressFactor}`,
     )
   }
 
@@ -111,33 +111,33 @@ export function calculateHarrisBenedict(input: HarrisBenedictInput): CalcResult 
   const proteinG = weightKg * PROTEIN_G_PER_KG
 
   return {
-    label: 'Total Daily Energy Expenditure',
+    label: 'Gasto Energético Diário Total',
     value: round(tdee, 0),
-    unit: 'kcal/day',
+    unit: 'kcal/dia',
     severity: 'info',
-    interpretation: `Estimated energy requirement ${round(tdee, 0)} kcal/day (BMR ${round(bmr, 0)} kcal/day × activity ${activityFactor} × stress ${stressFactor}). For enteral or parenteral nutrition, protein target ${round(proteinG, 0)} g/day at ${PROTEIN_G_PER_KG} g/kg. Adjust to measured body weight and to the clinical course.`,
+    interpretation: `Necessidade energética estimada ${round(tdee, 0)} kcal/dia (TMB ${round(bmr, 0)} kcal/dia × atividade ${activityFactor} × estresse ${stressFactor}). Para nutrição enteral ou parenteral, alvo de proteína ${round(proteinG, 0)} g/dia a ${PROTEIN_G_PER_KG} g/kg. Ajuste ao peso corporal medido e à evolução clínica.`,
     references: ENERGY_REFERENCES,
     subResults: [
       {
-        label: 'Resting Metabolic Rate',
+        label: 'Taxa Metabólica de Repouso',
         value: round(bmr, 0),
-        unit: 'kcal/day',
+        unit: 'kcal/dia',
         severity: 'info',
-        interpretation: `Revised Harris-Benedict equation for a ${sex === 'M' ? 'male' : 'female'}.`,
+        interpretation: `Equação de Harris-Benedict revisada para ${sex === 'M' ? 'um homem' : 'uma mulher'}.`,
       },
       {
-        label: 'Activity Level',
+        label: 'Nível de atividade',
         value: activityFactor,
         unit: '×',
         severity: 'info',
         interpretation: ACTIVITY_LABELS[activityFactor],
       },
       {
-        label: 'Protein Target',
+        label: 'Alvo de proteína',
         value: round(proteinG, 0),
-        unit: 'g/day',
+        unit: 'g/dia',
         severity: 'info',
-        interpretation: `${PROTEIN_G_PER_KG} g/kg/day × ${weightKg} kg.`,
+        interpretation: `${PROTEIN_G_PER_KG} g/kg/dia × ${weightKg} kg.`,
       },
     ],
   }

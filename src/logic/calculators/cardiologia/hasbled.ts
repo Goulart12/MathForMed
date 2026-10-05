@@ -5,6 +5,7 @@
  */
 
 import type { CalcResult, ReferenceRange } from '../../types'
+import { pluralize } from '../../utils/units'
 
 /** Inputs for {@link calculateHasBled}. */
 export interface HasBledInput {
@@ -29,9 +30,9 @@ export interface HasBledInput {
 }
 
 export const HAS_BLED_REFERENCES: ReferenceRange[] = [
-  { label: 'Low risk (0–1)', max: 1, severity: 'normal' },
-  { label: 'Moderate risk (2)', min: 2, max: 2, severity: 'attention' },
-  { label: 'High risk (≥ 3)', min: 3, severity: 'critical' },
+  { label: 'Baixo risco (0–1)', max: 1, severity: 'normal' },
+  { label: 'Risco moderado (2)', min: 2, max: 2, severity: 'attention' },
+  { label: 'Alto risco (≥ 3)', min: 3, severity: 'critical' },
 ]
 
 /** Maximum achievable HAS-BLED score. */
@@ -57,40 +58,40 @@ const CRITERIA: readonly (Omit<HasBledComponent, 'points' | 'present'> & {
   key: keyof HasBledInput
 })[] = [
   {
-    label: 'H — Uncontrolled hypertension',
-    description: 'Systolic BP > 160 mmHg',
+    label: 'H — Hipertensão não controlada',
+    description: 'PAS > 160 mmHg',
     key: 'hypertensionUncontrolled',
   },
   {
-    label: 'R — Renal disease',
-    description: 'Dialysis or creatinine > 2.26 mg/dL',
+    label: 'R — Doença renal',
+    description: 'Diálise ou creatinina > 2.26 mg/dL',
     key: 'renalDisease',
   },
   {
-    label: 'L — Liver disease',
-    description: 'Cirrhosis, bilirubin > 2× ULN or ALT > 3× ULN',
+    label: 'L — Doença hepática',
+    description: 'Cirrose, bilirrubina > 2× ULN ou ALT > 3× ULN',
     key: 'liverDisease',
   },
   {
-    label: 'S — Stroke history',
-    description: 'Previous stroke or systemic embolism',
+    label: 'S — Antecedente de AVC',
+    description: 'AVC prévio ou embolia sistêmica',
     key: 'strokeHistory',
   },
   {
-    label: 'B — Bleeding history',
-    description: 'Previous bleeding or a bleeding predisposition',
+    label: 'B — Antecedente de sangramento',
+    description: 'Sangramento prévio ou predisposição a sangramento',
     key: 'bleedingHistory',
   },
-  { label: 'L — Labile INR', description: 'Time in therapeutic range < 60%', key: 'labileInr' },
-  { label: 'E — Elderly', description: 'Age > 65 years', key: 'elderly' },
+  { label: 'L — INR instável', description: 'Tempo no intervalo terapêutico < 60%', key: 'labileInr' },
+  { label: 'E — Idoso', description: 'Idade > 65 anos', key: 'elderly' },
   {
-    label: 'D — Drugs',
-    description: 'Antiplatelet therapy or NSAIDs',
+    label: 'D — Drogas',
+    description: 'Terapia antiagregante plaquetária ou AINHs',
     key: 'drugsAntiplatelet',
   },
   {
-    label: 'D — Alcohol',
-    description: 'Eight or more units of alcohol per week',
+    label: 'D — Álcool',
+    description: 'Oito ou mais unidades de álcool por semana',
     key: 'alcoholUse',
   },
 ]
@@ -120,30 +121,30 @@ export function calculateHasBled(input: HasBledInput): CalcResult {
   const score = components.reduce((total, component) => total + component.points, 0)
 
   const severity = score <= 1 ? 'normal' : score === 2 ? 'attention' : 'critical'
-  const band = score <= 1 ? 'low' : score === 2 ? 'moderate' : 'high'
+  const band = score <= 1 ? 'baixo' : score === 2 ? 'moderado' : 'alto'
   const modifiers = components.filter(component => component.present)
 
   return {
-    label: 'HAS-BLED Score',
+    label: 'Escore HAS-BLED',
     value: score,
-    unit: 'points',
+    unit: pluralize(score, 'ponto'),
     severity,
-    interpretation: `HAS-BLED ${score} of ${HAS_BLED_MAX} — ${band} bleeding risk. A high HAS-BLED does not contraindicate anticoagulation; correct the modifiable factors (uncontrolled hypertension, liver dysfunction, alcohol use) and re-score after each review.`,
+    interpretation: `HAS-BLED ${score} de ${HAS_BLED_MAX} — risco de sangramento ${band}. Um HAS-BLED elevado não contraindica anticoagulação; corrija os fatores modificáveis (hipertensão não controlada, disfunção hepática, uso de álcool) e reavalie o escore após cada consulta.`,
     references: HAS_BLED_REFERENCES,
     subResults: modifiers.length
       ? modifiers.map(component => ({
           label: component.label,
           value: component.points,
-          unit: 'points',
+          unit: pluralize(component.points, 'ponto'),
           severity: 'info' as const,
           interpretation: component.description,
         }))
       : [
           {
-            label: 'Modifiable Risks',
+            label: 'Riscos modificáveis',
             value: 0,
             severity: 'info' as const,
-            interpretation: 'No modifiable bleeding risk factors identified.',
+            interpretation: 'Nenhum fator de risco de sangramento modificável identificado.',
           },
         ],
   }

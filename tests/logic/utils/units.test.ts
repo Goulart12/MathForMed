@@ -8,6 +8,7 @@ import {
   mmolLToMgDl,
   MOLAR_MASS,
   mgDlToMmolL,
+  pluralize,
   round,
   truncate,
 } from '@/logic/utils/units'
@@ -108,5 +109,22 @@ describe('truncate', () => {
 
   it('handles negative values toward zero', () => {
     expect(truncate(-1.29)).toBe(-1.2)
+  })
+})
+
+describe('pluralize', () => {
+  it('uses the singular for exactly one', () => {
+    expect(pluralize(1, 'ponto')).toBe('ponto')
+    expect(pluralize(-1, 'ponto')).toBe('ponto')
+  })
+
+  it('uses the plural for zero and for two or more', () => {
+    expect(pluralize(0, 'ponto')).toBe('pontos')
+    expect(pluralize(2, 'ponto')).toBe('pontos')
+    expect(pluralize(1.5, 'ponto')).toBe('pontos')
+  })
+
+  it('accepts an explicit irregular plural', () => {
+    expect(pluralize(2, 'mL', 'mL')).toBe('mL')
   })
 })

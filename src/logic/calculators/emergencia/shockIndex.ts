@@ -17,11 +17,11 @@ export interface ShockIndexInput {
 }
 
 export const SHOCK_INDEX_REFERENCES: ReferenceRange[] = [
-  { label: 'Stable (< 0.6)', max: 0.59, severity: 'normal' },
-  { label: 'Borderline (0.6–0.9)', min: 0.6, max: 0.89, severity: 'attention' },
-  { label: 'Abnormal (0.9–1.0)', min: 0.9, max: 0.99, severity: 'attention' },
-  { label: 'Moderate shock (1.0–1.4)', min: 1, max: 1.4, severity: 'critical' },
-  { label: 'Severe shock (> 1.4)', min: 1.4, severity: 'critical' },
+  { label: 'Estável (< 0.6)', max: 0.59, severity: 'normal' },
+  { label: 'Limítrofe (0.6–0.9)', min: 0.6, max: 0.89, severity: 'attention' },
+  { label: 'Anormal (0.9–1.0)', min: 0.9, max: 0.99, severity: 'attention' },
+  { label: 'Choque moderado (1.0–1.4)', min: 1, max: 1.4, severity: 'critical' },
+  { label: 'Choque grave (> 1.4)', min: 1.4, severity: 'critical' },
 ]
 
 /**
@@ -53,20 +53,20 @@ export function calculateShockIndex(input: ShockIndexInput): CalcResult {
     index < 0.6 ? 'normal' : index < 1 ? 'attention' : 'critical'
   const band =
     index < 0.6
-      ? 'stable haemodynamics'
+      ? 'hemodinâmica estável'
       : index < 0.9
-        ? 'borderline'
+        ? 'limítrofe'
         : index <= 1.4
-          ? 'moderate shock'
-          : 'severe shock'
+          ? 'choque moderado'
+          : 'choque grave'
 
   return {
-    label: 'Shock Index',
+    label: 'Índice de Choque',
     value: rounded,
     severity,
-    interpretation: `Shock Index ${rounded} (${heartRate} bpm / ${sysBp} mmHg) — ${band}.${
+    interpretation: `Índice de Choque ${rounded} (${heartRate} bpm / ${sysBp} mmHg) — ${band}.${
       index >= 1
-        ? ' An index of 1.0 or above is associated with a markedly increased mortality and warrants immediate assessment for shock and its cause.'
+        ? ' Um índice de 1.0 ou mais está associado a mortalidade marcadamente elevada e exige avaliação imediata de choque e de sua causa.'
         : ''
     }`,
     references: SHOCK_INDEX_REFERENCES,

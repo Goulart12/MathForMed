@@ -21,30 +21,30 @@ export interface KdigoStage extends ReferenceRange {
  * @reference KDIGO. Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117–S314.
  */
 export const KDIGO_STAGES = [
-  { stage: 'G1', label: 'G1 — Normal or high', min: 90, severity: 'normal' },
-  { stage: 'G2', label: 'G2 — Mildly decreased', min: 60, max: 89, severity: 'normal' },
+  { stage: 'G1', label: 'G1 — Normal ou elevada', min: 90, severity: 'normal' },
+  { stage: 'G2', label: 'G2 — Ligeiramente reduzida', min: 60, max: 89, severity: 'normal' },
   {
     stage: 'G3a',
-    label: 'G3a — Mildly-to-moderately decreased',
+    label: 'G3a — Ligeiramente a moderadamente reduzida',
     min: 45,
     max: 59,
     severity: 'attention',
   },
   {
     stage: 'G3b',
-    label: 'G3b — Moderately-to-severely decreased',
+    label: 'G3b — Moderadamente a severamente reduzida',
     min: 30,
     max: 44,
     severity: 'attention',
   },
   {
     stage: 'G4',
-    label: 'G4 — Severely decreased',
+    label: 'G4 — Severamente reduzida',
     min: 15,
     max: 29,
     severity: 'critical',
   },
-  { stage: 'G5', label: 'G5 — Kidney failure', max: 14, severity: 'critical' },
+  { stage: 'G5', label: 'G5 — Falência renal', max: 14, severity: 'critical' },
 ] as const
 
 /**

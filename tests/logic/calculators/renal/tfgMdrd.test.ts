@@ -5,7 +5,7 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateMdrd', () => {
   it('computes 61.8 mL/min/1.73 m² for a 60-year-old male with creatinine 1.2 mg/dL', () => {
     const result = calculateMdrd({ age: 60, serumCreatinineMgDl: 1.2, sex: 'M' })
-    expect(result.label).toBe('eGFR (MDRD)')
+    expect(result.label).toBe('TFGe (MDRD)')
     expect(result.value).toBeCloseTo(61.8, 1)
     expect(result.unit).toBe('mL/min/1.73 m²')
     expect(result.severity).toBe('normal')
@@ -26,7 +26,7 @@ describe('calculateMdrd', () => {
 
   it('warns that MDRD is less accurate above 90 mL/min/1.73 m²', () => {
     const result = calculateMdrd({ age: 30, serumCreatinineMgDl: 0.7, sex: 'M' })
-    expect(result.interpretation).toContain('less accurate')
+    expect(result.interpretation).toContain('menos acurada')
   })
 
   it('throws CalcValidationError for an unknown sex', () => {

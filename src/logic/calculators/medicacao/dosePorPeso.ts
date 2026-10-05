@@ -82,31 +82,31 @@ export function calculateDoseByWeight(input: DoseByWeightInput): CalcResult {
   const volumeText = round(volumeNeeded, 1)
 
   return {
-    label: 'Required Dose',
+    label: 'Dose necessária',
     value: volumeText,
     unit: 'mL',
     severity,
-    interpretation: `Total dose: ${doseText} ${baseUnit} (${unitDose} ${unitDoseUnit} × ${weightKg} kg). ${
+    interpretation: `Dose total: ${doseText} ${baseUnit} (${unitDose} ${unitDoseUnit} × ${weightKg} kg). ${
       exceedsPresentation
-        ? `This requires ${volumeText} mL but only ${availableVolumeMl} mL is available — the order cannot be filled from a single presentation.`
-        : `Draw ${volumeText} mL from the available solution.`
+        ? `Este cálculo exige ${volumeText} mL, mas há apenas ${availableVolumeMl} mL disponíveis — a prescrição não pode ser atendida com uma única apresentação.`
+        : `Aspire ${volumeText} mL da solução disponível.`
     }`,
     subResults: [
       {
-        label: 'Total Dose',
+        label: 'Dose total',
         value: doseText,
         unit: baseUnit,
         severity: 'info',
         interpretation: `${unitDose} ${unitDoseUnit} × ${weightKg} kg = ${doseText} ${baseUnit}.`,
       },
       {
-        label: 'Volume Available',
+        label: 'Volume disponível',
         value: round(availableVolumeMl, 1),
         unit: 'mL',
         severity: exceedsPresentation ? 'critical' : 'info',
         interpretation: exceedsPresentation
-          ? 'Insufficient volume in the presentation for this dose.'
-          : 'Sufficient volume in the presentation for this dose.',
+          ? 'Volume insuficiente na apresentação para esta dose.'
+          : 'Volume suficiente na apresentação para esta dose.',
       },
     ],
   }

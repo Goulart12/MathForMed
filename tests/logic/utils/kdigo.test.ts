@@ -43,7 +43,7 @@ describe('classifyKdigo', () => {
 
   it('labels every stage', () => {
     expect(classifyKdigo(100).label).toMatch(/^G1/)
-    expect(classifyKdigo(100).label).toMatch(/Normal or high/)
+    expect(classifyKdigo(100).label).toMatch(/Normal ou elevada/)
   })
 })
 

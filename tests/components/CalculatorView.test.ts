@@ -145,11 +145,11 @@ describe('CalculatorView', () => {
 
   it('surfaces a validation error instead of a result', async () => {
     calculate.mockImplementation(() => {
-      throw new CalcValidationError('weightKg', "Field 'weightKg' must be between 0.5 and 300 kg.")
+      throw new CalcValidationError('weightKg', "O campo 'weightKg' deve estar entre 0.5 e 300 kg.")
     })
     const wrapper = mountView()
     await submit(wrapper)
-    expect(wrapper.find('[role="alert"]').text()).toContain('must be between 0.5 and 300 kg')
+    expect(wrapper.find('[role="alert"]').text()).toContain('deve estar entre 0.5 e 300 kg')
     expect(wrapper.find('[aria-live="polite"]').exists()).toBe(false)
   })
 

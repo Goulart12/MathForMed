@@ -21,13 +21,13 @@ describe('calculateHba1c', () => {
   it('returns attention severity for prediabetes', () => {
     const result = calculateHba1c({ hba1cPercent: 6 })
     expect(result.severity).toBe('attention')
-    expect(result.interpretation).toContain('Prediabetes')
+    expect(result.interpretation).toContain('Pré-diabetes')
   })
 
   it('derives the ADAG estimated glucose in both units', () => {
     const result = calculateHba1c({ hba1cPercent: 7 })
     const values = result.subResults
-      ?.filter(sub => sub.label === 'Estimated Average Glucose')
+      ?.filter(sub => sub.label === 'Glicose Média Estimada')
       .map(sub => sub.value)
     expect(values).toEqual([154, 8.5])
     expect(result.subResults?.find(sub => sub.unit === 'mg/dL')?.value).toBe(154)
@@ -35,21 +35,21 @@ describe('calculateHba1c', () => {
 
   it('assesses the type 2 diabetes target', () => {
     const onTarget = calculateHba1c({ hba1cPercent: 6.5 }).subResults?.find(
-      sub => sub.label === 'Type 2 Diabetes Target',
+      sub => sub.label === 'Alvo para diabetes tipo 2',
     )
-    expect(onTarget?.value).toBe('On target')
+    expect(onTarget?.value).toBe('No alvo')
     expect(onTarget?.severity).toBe('normal')
 
     const near = calculateHba1c({ hba1cPercent: 7.5 }).subResults?.find(
-      sub => sub.label === 'Type 2 Diabetes Target',
+      sub => sub.label === 'Alvo para diabetes tipo 2',
     )
-    expect(near?.value).toBe('Near target')
+    expect(near?.value).toBe('Próximo do alvo')
     expect(near?.severity).toBe('attention')
 
     const off = calculateHba1c({ hba1cPercent: 9 }).subResults?.find(
-      sub => sub.label === 'Type 2 Diabetes Target',
+      sub => sub.label === 'Alvo para diabetes tipo 2',
     )
-    expect(off?.value).toBe('Off target')
+    expect(off?.value).toBe('Fora do alvo')
     expect(off?.severity).toBe('critical')
   })
 
@@ -78,13 +78,13 @@ describe('calculateHba1c', () => {
 
   it('boundary: the 7% treatment target switches from on-target to near-target', () => {
     expect(
-      calculateHba1c({ hba1cPercent: 6.9 }).subResults?.find(sub => sub.label === 'Type 2 Diabetes Target')
+      calculateHba1c({ hba1cPercent: 6.9 }).subResults?.find(sub => sub.label === 'Alvo para diabetes tipo 2')
         ?.value,
-    ).toBe('On target')
+    ).toBe('No alvo')
     expect(
-      calculateHba1c({ hba1cPercent: 7 }).subResults?.find(sub => sub.label === 'Type 2 Diabetes Target')
+      calculateHba1c({ hba1cPercent: 7 }).subResults?.find(sub => sub.label === 'Alvo para diabetes tipo 2')
         ?.value,
-    ).toBe('Near target')
+    ).toBe('Próximo do alvo')
   })
 
   it('boundary: accepts the minimum and maximum permitted HbA1c', () => {

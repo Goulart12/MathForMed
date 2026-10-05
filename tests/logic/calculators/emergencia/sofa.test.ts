@@ -20,18 +20,18 @@ const allZero = {
 describe('calculateSofa', () => {
   it('returns 0 and normal severity with no organ dysfunction', () => {
     const result = calculateSofa(allZero)
-    expect(result.label).toBe('SOFA Score')
+    expect(result.label).toBe('Escore SOFA')
     expect(result.value).toBe(0)
-    expect(result.unit).toBe('points')
+    expect(result.unit).toBe('pontos')
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('low organ dysfunction')
+    expect(result.interpretation).toContain('disfunção orgânica baixa')
   })
 
   it('returns attention severity at 7', () => {
     const result = calculateSofa({ ...allZero, respirationScore: 4, coagulationScore: 3 })
     expect(result.value).toBe(7)
     expect(result.severity).toBe('attention')
-    expect(result.interpretation).toContain('moderate organ dysfunction')
+    expect(result.interpretation).toContain('disfunção orgânica moderada')
   })
 
   it('returns critical severity at 10', () => {
@@ -45,17 +45,17 @@ describe('calculateSofa', () => {
     })
     expect(result.value).toBe(10)
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('high organ dysfunction')
-    expect(result.interpretation).toMatch(/reassess/i)
+    expect(result.interpretation).toContain('disfunção orgânica alta')
+    expect(result.interpretation).toMatch(/reavalie/i)
   })
 
   it('reports one sub-result per organ system with the table descriptor', () => {
     const result = calculateSofa({ ...allZero, cnsScore: 3, renalScore: 2 })
     expect(result.subResults).toHaveLength(6)
-    const cns = result.subResults?.find(sub => sub.label === 'Central nervous system')
+    const cns = result.subResults?.find(sub => sub.label === 'Sistema nervoso central')
     expect(cns?.interpretation).toBe('GCS 6–9')
     expect(cns?.severity).toBe('attention')
-    const respiration = result.subResults?.find(sub => sub.label === 'Respiration')
+    const respiration = result.subResults?.find(sub => sub.label === 'Respiração')
     expect(respiration?.severity).toBe('info')
   })
 

@@ -221,7 +221,7 @@ describe('application shell', () => {
     await height!.setValue('175')
     await wrapper.find('form').trigger('submit')
 
-    // 70 kg / 1.75 m → 22.9 kg/m², in the WHO "Normal weight" band.
+    // 70 kg / 1.75 m → 22.9 kg/m², na faixa "Peso normal" da OMS.
     await waitFor(() => wrapper.findComponent({ name: 'ResultCard' }).exists(), 'the result card')
     expect(wrapper.text()).toContain('22.9')
     expect(wrapper.text()).toContain('kg/m²')
@@ -247,9 +247,9 @@ describe('application shell', () => {
     await waitFor(() => wrapper.findComponent({ name: 'ResultCard' }).exists(), 'the result card')
     // E4 + V5 + M6 = 15, mild TBI, reported per component.
     expect(wrapper.text()).toContain('GCS 15 (E4 V5 M6)')
-    expect(wrapper.text()).toContain('Eye opening')
-    expect(wrapper.text()).toContain('Verbal response')
-    expect(wrapper.text()).toContain('Motor response')
+    expect(wrapper.text()).toContain('Abertura ocular')
+    expect(wrapper.text()).toContain('Resposta verbal')
+    expect(wrapper.text()).toContain('Resposta motora')
   })
 
   it('records a successful calculation in the history store', async () => {

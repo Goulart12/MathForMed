@@ -8,7 +8,7 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateAnionGap', () => {
   it('returns a normal gap of 12 mEq/L at the reference ceiling', () => {
     const result = calculateAnionGap({ sodium: 140, chloride: 100, bicarbonate: 28 })
-    expect(result.label).toBe('Anion Gap')
+    expect(result.label).toBe('Gap Aniônico')
     expect(result.value).toBe(12)
     expect(result.unit).toBe('mEq/L')
     expect(result.severity).toBe('normal')
@@ -18,7 +18,7 @@ describe('calculateAnionGap', () => {
     const result = calculateAnionGap({ sodium: 140, chloride: 90, bicarbonate: 16 })
     expect(result.value).toBe(34)
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('unmeasured anions')
+    expect(result.interpretation).toContain('ânions não medidos')
   })
 
   it('returns attention severity between 12 and 20', () => {
@@ -32,8 +32,8 @@ describe('calculateAnionGap', () => {
     const result = calculateAnionGap({ sodium: 140, chloride: 100, bicarbonate: 28, albumin: 2 })
     expect(result.value).toBe(17)
     expect(result.severity).toBe('attention')
-    expect(result.interpretation).toContain('albumin-corrected')
-    expect(result.subResults?.map(sub => sub.label)).toContain('Albumin Correction')
+    expect(result.interpretation).toContain('corrigido pela albumina')
+    expect(result.subResults?.map(sub => sub.label)).toContain('Correção pela albumina')
   })
 
   it('accepts a null albumin as uncorrected', () => {
@@ -44,23 +44,23 @@ describe('calculateAnionGap', () => {
       albumin: null,
     })
     expect(result.value).toBe(12)
-    expect(result.interpretation).not.toContain('albumin-corrected')
+    expect(result.interpretation).not.toContain('corrigido pela albumina')
   })
 
   it('adds a delta ratio only when the corrected gap exceeds 12', () => {
     const normal = calculateAnionGap({ sodium: 140, chloride: 100, bicarbonate: 28 })
-    expect(normal.subResults?.find(sub => sub.label === 'Delta Ratio')).toBeUndefined()
+    expect(normal.subResults?.find(sub => sub.label === 'Razão delta')).toBeUndefined()
 
     const elevated = calculateAnionGap({ sodium: 140, chloride: 100, bicarbonate: 20 })
-    const delta = elevated.subResults?.find(sub => sub.label === 'Delta Ratio')
+    const delta = elevated.subResults?.find(sub => sub.label === 'Razão delta')
     // (20 − 12) / (24 − 20) = 2
     expect(delta?.value).toBe(2)
-    expect(delta?.interpretation).toContain('Pure elevated anion gap')
+    expect(delta?.interpretation).toContain('pura por gap aniônico elevado')
   })
 
   it('always reports the measured gap as a sub-result', () => {
     const result = calculateAnionGap({ sodium: 140, chloride: 90, bicarbonate: 16 })
-    const measured = result.subResults?.find(sub => sub.label === 'Measured Anion Gap')
+    const measured = result.subResults?.find(sub => sub.label === 'Gap Aniônico medido')
     expect(measured?.value).toBe(34)
   })
 
@@ -133,7 +133,7 @@ describe('interpretDeltaRatio', () => {
     // (13 − 12) / (24 − 10) ≈ 0.07
     const delta = interpretDeltaRatio(13, 10)
     expect(delta.ratio).toBeCloseTo(0.07, 2)
-    expect(delta.interpretation).toContain('hyperchloraemic')
+    expect(delta.interpretation).toContain('hiperclorêmica')
     expect(delta.severity).toBe('attention')
   })
 
@@ -141,37 +141,37 @@ describe('interpretDeltaRatio', () => {
     // (18 − 12) / (24 − 16) = 0.75
     const delta = interpretDeltaRatio(18, 16)
     expect(delta.ratio).toBeCloseTo(0.75, 2)
-    expect(delta.interpretation).toContain('Mixed disorder')
+    expect(delta.interpretation).toContain('Distúrbio misto')
   })
 
   it('reports a pure elevated anion gap acidosis between 0.8 and 2', () => {
     // (24 − 12) / (24 − 12) = 1
     const delta = interpretDeltaRatio(24, 12)
     expect(delta.ratio).toBe(1)
-    expect(delta.interpretation).toContain('Pure elevated anion gap')
+    expect(delta.interpretation).toContain('pura por gap aniônico elevado')
   })
 
   it('boundary: a ratio of exactly 0.4 is still a mixed disorder', () => {
     // (16 − 12) / (24 − 14) = 0.4
-    expect(interpretDeltaRatio(16, 14).interpretation).toContain('Mixed disorder')
+    expect(interpretDeltaRatio(16, 14).interpretation).toContain('Distúrbio misto')
   })
 
   it('boundary: a ratio of exactly 2 is still a pure high anion gap acidosis', () => {
     // (20 − 12) / (24 − 20) = 2
-    expect(interpretDeltaRatio(20, 20).interpretation).toContain('Pure elevated anion gap')
+    expect(interpretDeltaRatio(20, 20).interpretation).toContain('pura por gap aniônico elevado')
   })
 
   it('reports a concurrent metabolic alkalosis above 2', () => {
     // (40 − 12) / (24 − 12) ≈ 2.33
     const delta = interpretDeltaRatio(40, 12)
     expect(delta.ratio).toBeCloseTo(2.33, 2)
-    expect(delta.interpretation).toContain('metabolic alkalosis')
+    expect(delta.interpretation).toContain('alcalose metabólica')
   })
 
   it('refuses to compute a ratio when bicarbonate is 24 or above', () => {
     const alkalosis = interpretDeltaRatio(30, 26)
     expect(alkalosis.ratio).toBeNull()
-    expect(alkalosis.interpretation).toContain('not calculable')
+    expect(alkalosis.interpretation).toContain('não calculável')
     expect(alkalosis.severity).toBe('attention')
   })
 })

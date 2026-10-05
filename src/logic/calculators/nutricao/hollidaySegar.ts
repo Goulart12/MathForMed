@@ -18,9 +18,9 @@ export interface HollidaySegarInput {
 export const MAX_ML_PER_DAY = 2500
 
 export const HOLLIDAY_SEGAR_REFERENCES: ReferenceRange[] = [
-  { label: 'First 10 kg: 4 mL/kg/h', min: 0.5, max: 10, severity: 'info' },
-  { label: 'Next 10 kg: 2 mL/kg/h', min: 10, max: 20, severity: 'info' },
-  { label: 'Above 20 kg: 1 mL/kg/h', min: 20, max: 100, severity: 'info' },
+  { label: 'Primeiros 10 kg: 4 mL/kg/h', min: 0.5, max: 10, severity: 'info' },
+  { label: 'Próximos 10 kg: 2 mL/kg/h', min: 10, max: 20, severity: 'info' },
+  { label: 'Acima de 20 kg: 1 mL/kg/h', min: 20, max: 100, severity: 'info' },
 ]
 
 /**
@@ -63,26 +63,26 @@ export function calculateHollidaySegar(input: HollidaySegarInput): CalcResult {
 
   const rule =
     weightKg <= 10
-      ? 'first 10 kg at 4 mL/kg/h'
+      ? 'primeiros 10 kg a 4 mL/kg/h'
       : weightKg <= 20
-        ? 'first 10 kg at 4 mL/kg/h plus next 10 kg at 2 mL/kg/h'
-        : 'first 10 kg at 4 mL/kg/h, next 10 kg at 2 mL/kg/h, remainder at 1 mL/kg/h'
+        ? 'primeiros 10 kg a 4 mL/kg/h mais os próximos 10 kg a 2 mL/kg/h'
+        : 'primeiros 10 kg a 4 mL/kg/h, próximos 10 kg a 2 mL/kg/h e o restante a 1 mL/kg/h'
 
   return {
-    label: 'Maintenance Fluid Rate',
+    label: 'Taxa de manutenção de líquidos',
     value: round(mlPerHour, 1),
     unit: 'mL/h',
     severity: 'info',
-    interpretation: `Maintenance fluid ${round(mlPerHour, 1)} mL/h (${mlPerHour} mL/h by the 4-2-1 rule: ${rule}), equivalent to ${mlPerDay} mL/day. Exclude insensible losses, deficit replacement and any ongoing losses from this figure, and reduce it in heart failure or renal failure.`,
+    interpretation: `Manutenção de líquidos ${round(mlPerHour, 1)} mL/h (${mlPerHour} mL/h pela regra 4-2-1: ${rule}), equivalente a ${mlPerDay} mL/dia. Exclua deste valor as perdas insensíveis, a reposição do déficit e quaisquer perdas em curso, e reduza-o na insuficiência cardíaca ou na falência renal.`,
     references: HOLLIDAY_SEGAR_REFERENCES,
     subResults: [
       {
-        label: 'Daily Volume',
+        label: 'Volume diário',
         value: mlPerDay,
-        unit: 'mL/day',
+        unit: 'mL/dia',
         severity: 'info',
         interpretation: capped
-          ? `4-2-1 would give ${round(uncappedPerDay, 0)} mL/day; capped at ${MAX_ML_PER_DAY} mL/day because the hourly rule overestimates requirements above about 30 kg.`
+          ? `A regra 4-2-1 daria ${round(uncappedPerDay, 0)} mL/dia; valor limitado a ${MAX_ML_PER_DAY} mL/dia porque a regra horária superestima as necessidades acima de cerca de 30 kg.`
           : `${round(mlPerHour, 1)} mL/h × 24 h.`,
       },
     ],

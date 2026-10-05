@@ -33,7 +33,7 @@ export const ADULT_MEAN_BSA_M2 = 1.73
 
 export const BSA_REFERENCES: ReferenceRange[] = [
   {
-    label: 'Average adult',
+    label: 'Adulto médio',
     min: 1.5,
     max: 2.0,
     severity: 'normal',
@@ -70,11 +70,11 @@ export function calculateBsa(input: BsaInput): CalcResult {
   const rounded = round(bsa, 2)
 
   return {
-    label: 'Body Surface Area',
+    label: 'Superfície Corporal',
     value: rounded,
     unit: 'm²',
     severity: 'info',
-    interpretation: `BSA ${rounded} m² by the ${FORMULA_LABELS[formula]} formula. The average adult reference is ${ADULT_MEAN_BSA_M2} m²; chemotherapy doses in mg/m² scale with this value.`,
+    interpretation: `SC ${rounded} m² pela fórmula de ${FORMULA_LABELS[formula]}. A referência do adulto médio é ${ADULT_MEAN_BSA_M2} m²; as doses de quimioterapia em mg/m² são calculadas a partir deste valor.`,
     references: BSA_REFERENCES,
   }
 }

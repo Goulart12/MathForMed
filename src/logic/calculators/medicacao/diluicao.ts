@@ -50,7 +50,7 @@ export function calculateDilution(input: DilutionInput): CalcResult {
   if (finalConcentration >= initialConcentration) {
     throw new CalcValidationError(
       'finalConcentration',
-      `Field 'finalConcentration' must be lower than the stock concentration ${initialConcentration} — this calculator dilutes, it does not concentrate.`,
+      `O campo 'finalConcentration' deve ser menor que a concentração em estoque ${initialConcentration} — esta calculadora dilui, não concentra.`,
     )
   }
 
@@ -58,25 +58,25 @@ export function calculateDilution(input: DilutionInput): CalcResult {
   const solventVolume = finalVolume - initialVolumeMl
 
   return {
-    label: 'Diluent Volume',
+    label: 'Volume do diluente',
     value: round(solventVolume, 1),
     unit: 'mL',
     severity: 'info',
-    interpretation: `Withdraw ${initialVolumeMl} mL of the stock solution and add ${round(solventVolume, 1)} mL of diluent to obtain ${round(finalVolume, 1)} mL at the target concentration.`,
+    interpretation: `Aspire ${initialVolumeMl} mL da solução em estoque e acrescente ${round(solventVolume, 1)} mL de diluente para obter ${round(finalVolume, 1)} mL na concentração-alvo.`,
     subResults: [
       {
-        label: 'Final Volume',
+        label: 'Volume final',
         value: round(finalVolume, 1),
         unit: 'mL',
         severity: 'info',
         interpretation: `(${initialConcentration} × ${initialVolumeMl} mL) ÷ ${finalConcentration} = ${round(finalVolume, 1)} mL.`,
       },
       {
-        label: 'Stock Volume',
+        label: 'Volume em estoque',
         value: round(initialVolumeMl, 1),
         unit: 'mL',
         severity: 'info',
-        interpretation: 'Volume taken from the stock presentation.',
+        interpretation: 'Volume retirado da apresentação em estoque.',
       },
     ],
   }

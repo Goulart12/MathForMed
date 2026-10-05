@@ -5,16 +5,16 @@ import { HISTORY_KEY, MAX_ENTRIES, useHistoryStore } from '@/stores/history'
 import { resetLocalStorage } from './helpers'
 
 const result: CalcResult = {
-  label: 'Body Mass Index',
+  label: 'Índice de Massa Corporal',
   value: 22.1,
   unit: 'kg/m²',
   severity: 'normal',
-  interpretation: 'BMI 22.1 kg/m² — Normal weight.',
+  interpretation: 'IMC 22.1 kg/m² — Peso normal.',
 }
 
 const entry = (calculatorId = 'imc') => ({
   calculatorId,
-  calculatorName: 'Body Mass Index (BMI)',
+  calculatorName: 'Índice de Massa Corporal (IMC)',
   result,
   inputs: { weightKg: 70, heightM: 1.78 },
 })

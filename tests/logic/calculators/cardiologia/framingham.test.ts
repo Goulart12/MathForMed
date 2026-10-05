@@ -37,11 +37,11 @@ describe('framinghamBreakdown', () => {
       components.map(component => [component.label, component.points]),
     )
 
-    expect(points['Age']).toBe(8)
-    expect(points['Total cholesterol']).toBe(3)
-    expect(points['HDL cholesterol']).toBe(1)
-    expect(points['Systolic BP (untreated)']).toBe(1)
-    expect(points['Current smoker']).toBe(0)
+    expect(points['Idade']).toBe(8)
+    expect(points['Colesterol total']).toBe(3)
+    expect(points['Colesterol HDL']).toBe(1)
+    expect(points['Pressão arterial sistólica (não tratada)']).toBe(1)
+    expect(points['Fumante atual']).toBe(0)
     expect(totalPoints).toBe(13)
   })
 
@@ -99,8 +99,8 @@ describe('framinghamBreakdown', () => {
   it('scales smoking points down with age', () => {
     const young = framinghamBreakdown({ ...lowRiskMale, age: 40, smoker: true })
     const old = framinghamBreakdown({ ...lowRiskMale, age: 75, smoker: true })
-    const youngPoints = young.components.find(c => c.label === 'Current smoker')?.points ?? 0
-    const oldPoints = old.components.find(c => c.label === 'Current smoker')?.points ?? 0
+    const youngPoints = young.components.find(c => c.label === 'Fumante atual')?.points ?? 0
+    const oldPoints = old.components.find(c => c.label === 'Fumante atual')?.points ?? 0
     expect(youngPoints).toBeGreaterThan(oldPoints)
   })
 
@@ -130,7 +130,7 @@ describe('framinghamBreakdown', () => {
   it('steps the systolic BP points at every published band edge', () => {
     const pointsFor = (sysBpMmhg: number) =>
       framinghamBreakdown({ ...lowRiskMale, age: 45, sysBpMmhg })
-        .components.find(c => c.label.startsWith('Systolic BP'))?.points
+        .components.find(c => c.label.startsWith('Pressão arterial sistólica'))?.points
 
     // Age 45–49 is column 1, so only the systolic term moves across this sweep.
     expect(pointsFor(119)).toBe(0)
@@ -147,7 +147,7 @@ describe('framinghamBreakdown', () => {
   it('steps the HDL points at every published band edge', () => {
     const pointsFor = (hdlCholesterolMgDl: number) =>
       framinghamBreakdown({ ...lowRiskMale, age: 45, hdlCholesterolMgDl })
-        .components.find(c => c.label === 'HDL cholesterol')?.points
+        .components.find(c => c.label === 'Colesterol HDL')?.points
 
     expect(pointsFor(39)).toBe(2)
     expect(pointsFor(40)).toBe(1)
@@ -161,7 +161,7 @@ describe('framinghamBreakdown', () => {
   it('steps the total cholesterol points at every published band edge', () => {
     const pointsFor = (totalCholesterolMgDl: number) =>
       framinghamBreakdown({ ...lowRiskMale, age: 45, totalCholesterolMgDl })
-        .components.find(c => c.label === 'Total cholesterol')?.points
+        .components.find(c => c.label === 'Colesterol total')?.points
 
     expect(pointsFor(159)).toBe(0)
     expect(pointsFor(160)).toBe(3)
@@ -202,18 +202,18 @@ describe('calculateFramingham', () => {
       bpTreated: false,
       sex: 'M',
     })
-    expect(result.label).toBe('10-year CHD Risk')
+    expect(result.label).toBe('Risco de DAC em 10 anos')
     expect(result.value).toBe(12)
     expect(result.unit).toBe('%')
     expect(result.severity).toBe('attention')
-    expect(result.interpretation).toContain('Moderate risk')
+    expect(result.interpretation).toContain('Moderado risco')
   })
 
   it('returns normal severity below 10%', () => {
     const result = calculateFramingham(lowRiskMale)
     expect(Number(result.value)).toBeLessThan(10)
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('Low risk')
+    expect(result.interpretation).toContain('Baixo risco')
   })
 
   it('returns critical severity above 20%', () => {
@@ -229,15 +229,15 @@ describe('calculateFramingham', () => {
     })
     expect(Number(result.value)).toBeGreaterThan(20)
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('High risk')
+    expect(result.interpretation).toContain('Alto risco')
   })
 
   it('reports diabetes as a flag rather than inventing a point value', () => {
     const result = calculateFramingham({ ...lowRiskMale, diabetic: true })
     const diabetes = result.subResults?.find(sub => sub.label === 'Diabetes')
-    expect(diabetes?.value).toBe('Yes')
+    expect(diabetes?.value).toBe('Sim')
     expect(diabetes?.severity).toBe('attention')
-    expect(diabetes?.interpretation).toContain('not a scored variable')
+    expect(diabetes?.interpretation).toContain('não é uma variável pontuada')
     expect(result.interpretation).toContain('ACC/AHA')
   })
 
@@ -250,11 +250,11 @@ describe('calculateFramingham', () => {
   it('includes the point total and each factor as sub-results', () => {
     const result = calculateFramingham(lowRiskMale)
     const labels = result.subResults?.map(sub => sub.label)
-    expect(labels).toContain('Point Total')
-    expect(labels).toContain('Age')
-    expect(labels).toContain('Total cholesterol')
-    expect(labels).toContain('HDL cholesterol')
-    expect(labels).toContain('Current smoker')
+    expect(labels).toContain('Total de pontos')
+    expect(labels).toContain('Idade')
+    expect(labels).toContain('Colesterol total')
+    expect(labels).toContain('Colesterol HDL')
+    expect(labels).toContain('Fumante atual')
   })
 
   it('reports a sub-1% risk as such in the interpretation', () => {

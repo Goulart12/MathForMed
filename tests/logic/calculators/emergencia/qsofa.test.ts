@@ -7,18 +7,18 @@ const baseline = { respiratoryRate: 16, alteredMentation: false, sysBp: 120 }
 describe('calculateQsofa', () => {
   it('returns 0 and normal severity for a well patient', () => {
     const result = calculateQsofa(baseline)
-    expect(result.label).toBe('qSOFA Score')
+    expect(result.label).toBe('Escore qSOFA')
     expect(result.value).toBe(0)
-    expect(result.unit).toBe('points')
+    expect(result.unit).toBe('pontos')
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('does not exclude sepsis')
+    expect(result.interpretation).toContain('não exclui sepse')
   })
 
   it('returns critical severity at 2 or more', () => {
     const result = calculateQsofa({ respiratoryRate: 24, alteredMentation: true, sysBp: 88 })
     expect(result.value).toBe(3)
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('consider sepsis evaluation')
+    expect(result.interpretation).toContain('considere avaliação para sepse')
   })
 
   it('returns critical severity at exactly 2', () => {
@@ -37,7 +37,7 @@ describe('calculateQsofa', () => {
     const result = calculateQsofa({ respiratoryRate: 24, alteredMentation: true, sysBp: 88 })
     expect(result.subResults).toHaveLength(3)
     expect(result.subResults?.map(sub => sub.value)).toEqual([1, 1, 1])
-    expect(result.subResults?.[1]?.label).toContain('Altered mentation')
+    expect(result.subResults?.[1]?.label).toContain('Alteração do estado mental')
   })
 
   it('throws CalcValidationError for out-of-range vital signs', () => {
