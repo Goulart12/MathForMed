@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "MedCalc — medical calculators for the point of care. Offline-first PWA.",
+  "description": "MathForMed — medical calculators for the point of care. Offline-first PWA.",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",

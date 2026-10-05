@@ -1,9 +1,9 @@
-# MedCalc — Design Layer Implementation Report
+# MathForMed — Design Layer Implementation Report
 
 **Branch:** `feat/design-system` · **Base:** `main` (`230697b`) · **Commit:** `32a687d`
 **Scope:** all 10 tasks of `.opencode/agents/design-agent.md`
 
-This is a complete account of the visual layer of MedCalc: what was built, why
+This is a complete account of the visual layer of MathForMed: what was built, why
 each non-obvious decision was made, what was verified, and what is left for the
 logic merge. It is written to be read by someone who has not seen the work.
 

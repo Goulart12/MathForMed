@@ -49,7 +49,7 @@ watch(
 watch(
   meta,
   (current) => {
-    document.title = current ? `MedCalc · ${current.shortName}` : 'MedCalc'
+    document.title = current ? `MathForMed · ${current.shortName}` : 'MathForMed'
   },
   { immediate: true },
 )
@@ -105,7 +105,7 @@ async function handleShare() {
   const current = result.value
   if (!current) return
   const value = `${current.value}${current.unit ? ` ${current.unit}` : ''}`
-  const text = `${meta.value?.name ?? 'MedCalc'}: ${value} — ${current.label}`
+  const text = `${meta.value?.name ?? 'MathForMed'}: ${value} — ${current.label}`
   try {
     if (navigator.share) {
       await navigator.share({ title: meta.value?.name, text })

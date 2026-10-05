@@ -1,6 +1,6 @@
-# MedCalc — design layer (`feat/design-system`)
+# MathForMed — design layer (`feat/design-system`)
 
-Visual layer of MedCalc: Vue 3 + Tailwind v4 PWA for medical calculators at the
+Visual layer of MathForMed: Vue 3 + Tailwind v4 PWA for medical calculators at the
 point of care. Owns `src/components/`, `src/views/`, `src/router/`,
 `src/composables/`, `src/data/`, `src/types/`, `public/` and the root configs.
 

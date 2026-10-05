@@ -24,7 +24,7 @@ const recent = computed(() => history.latest.slice(0, 8))
       <div class="mx-auto max-w-3xl px-4 py-3">
         <div class="mb-2 flex items-center gap-2">
           <PhCalculator :size="22" weight="bold" class="text-primary-600" aria-hidden="true" />
-          <h1 class="text-lg font-bold text-ink">MedCalc</h1>
+          <h1 class="text-lg font-bold text-ink">MathForMed</h1>
         </div>
         <!-- Read-only: the whole field is one tap target into the search route,
              which is where the keyboard and the result list belong. -->

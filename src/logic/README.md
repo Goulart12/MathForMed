@@ -1,4 +1,4 @@
-# MedCalc — Logic layer
+# MathForMed — Logic layer
 
 Pure-TypeScript domain layer. **No Vue, no Pinia, no DOM, no browser APIs.**
 Everything here is a pure, deterministic function or a frozen constant.

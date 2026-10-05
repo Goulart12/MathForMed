@@ -1,5 +1,5 @@
 /**
- * Global domain types for MedCalc.
+ * Global domain types for MathForMed.
  *
  * This module is the single source of truth shared by the logic layer
  * (`src/logic/**`) and the presentation layer (`src/components/**`, `src/views/**`).

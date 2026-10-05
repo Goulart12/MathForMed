@@ -18,8 +18,8 @@ export default defineConfig({
         navigateFallback: 'index.html',
       },
       manifest: {
-        name: 'MedCalc',
-        short_name: 'MedCalc',
+        name: 'MathForMed',
+        short_name: 'MathForMed',
         description: 'Medical calculators for clinical use',
         lang: 'pt-BR',
         dir: 'ltr',

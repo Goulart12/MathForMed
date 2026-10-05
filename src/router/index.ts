@@ -15,7 +15,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
-    meta: { title: 'MedCalc' },
+    meta: { title: 'MathForMed' },
   },
   {
     path: '/search',
@@ -69,7 +69,8 @@ export function createAppRouter(): Router {
 
   router.afterEach((to) => {
     const title = to.meta.title
-    document.title = typeof title === 'string' && title ? `MedCalc · ${title}` : 'MedCalc'
+    document.title =
+      typeof title === 'string' && title ? `MathForMed · ${title}` : 'MathForMed'
   })
 
   return router

@@ -7,4 +7,7 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.opencode/agents/
 *.tsbuildinfo
+.opencode/agents/logic-agent.md
+.opencode/agents/design-agent.md

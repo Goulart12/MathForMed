@@ -1,7 +1,7 @@
 ---
 description: "Implements the pure-TypeScript domain layer of MedCalc: all 22 medical calculation functions, global types, physiological validators, unit converters, Pinia stores and 100% Vitest coverage. Never imports Vue or any UI library."
 mode: subagent
-model: anthropic/claude-sonnet-4-6
+model: space-bunny-free
 color: green
 ---
 
@@ -32,52 +32,52 @@ color: green
 ## Task 1 — Global Types (`src/logic/types.ts`)
 
 ```typescript
-export type Severity = 'normal' | 'attention' | 'critical' | 'info'
+export type Severity = "normal" | "attention" | "critical" | "info";
 
 export interface CalcResult {
-  value: number | string
-  unit?: string
-  label: string
-  severity: Severity
-  interpretation: string
-  references?: ReferenceRange[]
-  subResults?: CalcResult[]       // for composite scores (Glasgow components, etc.)
+  value: number | string;
+  unit?: string;
+  label: string;
+  severity: Severity;
+  interpretation: string;
+  references?: ReferenceRange[];
+  subResults?: CalcResult[]; // for composite scores (Glasgow components, etc.)
 }
 
 export interface ReferenceRange {
-  label: string
-  min?: number
-  max?: number
-  severity: Severity
+  label: string;
+  min?: number;
+  max?: number;
+  severity: Severity;
 }
 
 export interface CalculatorMeta {
-  id: string
-  name: string
-  shortName: string
-  description: string
-  category: CalcCategory
-  tags: string[]
-  evidenceLevel?: 'A' | 'B' | 'C'
-  reference?: string
+  id: string;
+  name: string;
+  shortName: string;
+  description: string;
+  category: CalcCategory;
+  tags: string[];
+  evidenceLevel?: "A" | "B" | "C";
+  reference?: string;
 }
 
 export type CalcCategory =
-  | 'medicacao'
-  | 'antropometria'
-  | 'renal'
-  | 'cardiologia'
-  | 'emergencia'
-  | 'laboratorial'
-  | 'nutricao'
+  | "medicacao"
+  | "antropometria"
+  | "renal"
+  | "cardiologia"
+  | "emergencia"
+  | "laboratorial"
+  | "nutricao";
 
 export class CalcValidationError extends Error {
   constructor(
     public readonly field: string,
     message: string,
   ) {
-    super(message)
-    this.name = 'CalcValidationError'
+    super(message);
+    this.name = "CalcValidationError";
   }
 }
 ```
@@ -89,7 +89,7 @@ export class CalcValidationError extends Error {
 ### `src/logic/utils/validators.ts`
 
 ```typescript
-import { CalcValidationError } from '../types'
+import { CalcValidationError } from "../types";
 
 /**
  * Throws CalcValidationError if value is outside [min, max].
@@ -105,7 +105,7 @@ export function assertRange(
     throw new CalcValidationError(
       field,
       `Field '${field}' must be between ${min} and ${max} ${unit}. Received: ${value}`,
-    )
+    );
   }
 }
 ```
@@ -113,15 +113,17 @@ export function assertRange(
 ### `src/logic/utils/units.ts`
 
 ```typescript
-export const MOLAR_MASS = { glucose: 180.16, urea: 60.06 } as const
+export const MOLAR_MASS = { glucose: 180.16, urea: 60.06 } as const;
 
-export const mgDlToMmolL = (v: number, mm: number) => v / mm * 10
-export const mmolLToMgDl = (v: number, mm: number) => v * mm / 10
-export const mlHToDropsMin = (mlH: number, factor: 20 | 60) => (mlH * factor) / 60
-export const dropsMinToMlH = (drops: number, factor: 20 | 60) => (drops / factor) * 60
-export const kgToLb = (kg: number) => kg * 2.20462
-export const lbToKg = (lb: number) => lb / 2.20462
-export const cmToM  = (cm: number) => cm / 100
+export const mgDlToMmolL = (v: number, mm: number) => (v / mm) * 10;
+export const mmolLToMgDl = (v: number, mm: number) => (v * mm) / 10;
+export const mlHToDropsMin = (mlH: number, factor: 20 | 60) =>
+  (mlH * factor) / 60;
+export const dropsMinToMlH = (drops: number, factor: 20 | 60) =>
+  (drops / factor) * 60;
+export const kgToLb = (kg: number) => kg * 2.20462;
+export const lbToKg = (lb: number) => lb / 2.20462;
+export const cmToM = (cm: number) => cm / 100;
 ```
 
 ---
@@ -144,6 +146,7 @@ Each file must export: (a) a typed `Input` interface, (b) the main calculation f
 ### MEDICATION — `src/logic/calculators/medicacao/`
 
 #### `dosePorPeso.ts`
+
 ```
 @reference Brunton LL et al. Goodman & Gilman's Pharmacological Basis of Therapeutics. 13th ed.
 
@@ -173,6 +176,7 @@ Output CalcResult:
 ```
 
 #### `gotejamento.ts`
+
 ```
 @reference Infusion Nurses Society. Infusion Therapy Standards of Practice. 2021.
 
@@ -199,6 +203,7 @@ Output CalcResult:
 ```
 
 #### `diluicao.ts`
+
 ```
 @reference Trissel LA. Handbook on Injectable Drugs. 18th ed.
 
@@ -221,6 +226,7 @@ severity: 'info'
 ```
 
 #### `infusaoContinua.ts`
+
 ```
 @reference Lexicomp Online. Drug Information. Wolters Kluwer.
 
@@ -245,6 +251,7 @@ severity: 'info'
 ### ANTHROPOMETRY — `src/logic/calculators/antropometria/`
 
 #### `imc.ts` (BMI)
+
 ```
 @reference WHO. Obesity: preventing and managing the global epidemic. 2000.
 
@@ -262,6 +269,7 @@ WHO Classification → severity:
 ```
 
 #### `superficieCorporal.ts` (BSA)
+
 ```
 @reference Mosteller RD. NEJM. 1987;317:1098.
 @reference DuBois D, DuBois EF. Arch Intern Med. 1916.
@@ -276,6 +284,7 @@ interpretation: include the formula name used and the average adult reference (1
 ```
 
 #### `pesoIdeal.ts` (Ideal Body Weight)
+
 ```
 @reference Devine BJ. Drug Intell Clin Pharm. 1974;8:650–655.
 
@@ -300,6 +309,7 @@ severity: 'info'
 ### RENAL — `src/logic/calculators/renal/`
 
 #### `creatininaClearance.ts` (Cockcroft-Gault)
+
 ```
 @reference Cockcroft DW, Gault MH. Nephron. 1976;16(1):31–41.
 
@@ -319,6 +329,7 @@ KDIGO staging → severity:
 ```
 
 #### `tfgCkdEpi.ts` (CKD-EPI 2021)
+
 ```
 @reference Inker LA et al. NEJM. 2021;385:1737–1749. (race-neutral equation)
 
@@ -340,6 +351,7 @@ Same KDIGO staging as Cockcroft-Gault.
 ```
 
 #### `tfgMdrd.ts`
+
 ```
 @reference Levey AS et al. Ann Intern Med. 1999;130:461–470.
 
@@ -354,6 +366,7 @@ Same KDIGO staging.
 ### CARDIOLOGY — `src/logic/calculators/cardiologia/`
 
 #### `chadsVasc.ts`
+
 ```
 @reference Lip GYH et al. Chest. 2010;137(2):263–272.
 @reference ESC Guidelines for AF management. Eur Heart J. 2024.
@@ -389,6 +402,7 @@ Note in interpretation: female sex alone (score = 1, male equivalent = 0) does n
 ```
 
 #### `hasbled.ts`
+
 ```
 @reference Pisters R et al. Chest. 2010;138(5):1093–1100.
 
@@ -424,6 +438,7 @@ interpretation: high HAS-BLED does not contraindicate anticoagulation; focus on 
 ```
 
 #### `framingham.ts`
+
 ```
 @reference Wilson PW et al. Circulation. 1998;97(18):1837–1847.
 
@@ -446,6 +461,7 @@ Risk stratification:
 ### EMERGENCY — `src/logic/calculators/emergencia/`
 
 #### `glasgow.ts`
+
 ```
 @reference Teasdale G, Jennett B. Lancet. 1974;2(7872):81–84.
 
@@ -468,6 +484,7 @@ subResults: individual component scores with their labels
 ```
 
 #### `qsofa.ts`
+
 ```
 @reference Seymour CW et al. JAMA. 2016;315(8):762–774.
 
@@ -488,6 +505,7 @@ interpretation when critical: 'qSOFA ≥ 2: consider sepsis evaluation and escal
 ```
 
 #### `sofa.ts`
+
 ```
 @reference Singer M et al. JAMA. 2016;315(8):801–810.
 
@@ -511,6 +529,7 @@ subResults: one CalcResult per organ system.
 ```
 
 #### `shockIndex.ts`
+
 ```
 @reference Allgöwer M, Burri C. Dtsch Med Wochenschr. 1967;92(43):1947–1950.
 
@@ -530,6 +549,7 @@ Severity:
 ### LABORATORY — `src/logic/calculators/laboratorial/`
 
 #### `anionGap.ts`
+
 ```
 @reference Emmett M, Narins RG. Medicine. 1977;56(1):38–54.
 
@@ -554,6 +574,7 @@ If AG_corrected > 12, compute delta ratio:
 ```
 
 #### `osmolalidade.ts`
+
 ```
 @reference Bhagat CI et al. Clin Chem. 1984;30(10):1706–1708.
 
@@ -571,6 +592,7 @@ If measuredOsmolality provided:
 ```
 
 #### `correcaoSodio.ts`
+
 ```
 @reference Katz MA. NEJM. 1973;289(16):843–844.
 
@@ -585,6 +607,7 @@ Classification of correctedNa:
 ```
 
 #### `correcaoCalcio.ts`
+
 ```
 @reference Payne RB et al. BMJ. 1973;4(5893):643–646.
 
@@ -600,6 +623,7 @@ Severity thresholds:
 ```
 
 #### `hba1c.ts`
+
 ```
 @reference Nathan DM et al. Diabetes Care. 2008;31(8):1473–1478. (ADAG Study)
 
@@ -624,6 +648,7 @@ T2DM treatment target sub-result:
 ### NUTRITION — `src/logic/calculators/nutricao/`
 
 #### `harrisBenedict.ts`
+
 ```
 @reference Roza AM, Shizgal HM. Am J Clin Nutr. 1984;40(1):168–182. (revised Harris-Benedict)
 
@@ -642,6 +667,7 @@ subResults: [BMR, TDEE, Protein target]
 ```
 
 #### `hollidaySegar.ts`
+
 ```
 @reference Holliday MA, Segar WE. Pediatrics. 1957;19(5):823–832.
 
@@ -668,68 +694,78 @@ severity: 'info'
 ### `favorites.ts`
 
 ```typescript
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
 
-export const useFavoritesStore = defineStore('favorites', () => {
-  const ids = ref<string[]>(JSON.parse(localStorage.getItem('medcalc-favorites') ?? '[]'))
+export const useFavoritesStore = defineStore(
+  "favorites",
+  () => {
+    const ids = ref<string[]>(
+      JSON.parse(localStorage.getItem("medcalc-favorites") ?? "[]"),
+    );
 
-  function toggle(id: string) {
-    const idx = ids.value.indexOf(id)
-    if (idx === -1) ids.value.push(id)
-    else ids.value.splice(idx, 1)
-    localStorage.setItem('medcalc-favorites', JSON.stringify(ids.value))
-  }
+    function toggle(id: string) {
+      const idx = ids.value.indexOf(id);
+      if (idx === -1) ids.value.push(id);
+      else ids.value.splice(idx, 1);
+      localStorage.setItem("medcalc-favorites", JSON.stringify(ids.value));
+    }
 
-  const isFavorite = (id: string) => ids.value.includes(id)
+    const isFavorite = (id: string) => ids.value.includes(id);
 
-  return { ids, toggle, isFavorite }
-}, { persist: true })
+    return { ids, toggle, isFavorite };
+  },
+  { persist: true },
+);
 ```
 
 ### `history.ts`
 
 ```typescript
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { CalcResult } from '@/logic/types'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import type { CalcResult } from "@/logic/types";
 
 export interface HistoryEntry {
-  id: string                        // crypto.randomUUID()
-  calculatorId: string
-  calculatorName: string
-  timestamp: string                 // ISO 8601
-  result: CalcResult
-  inputs: Record<string, unknown>   // ⚠️ never include patient-identifying data
+  id: string; // crypto.randomUUID()
+  calculatorId: string;
+  calculatorName: string;
+  timestamp: string; // ISO 8601
+  result: CalcResult;
+  inputs: Record<string, unknown>; // ⚠️ never include patient-identifying data
 }
 
-const MAX_ENTRIES = 50
+const MAX_ENTRIES = 50;
 
-export const useHistoryStore = defineStore('history', () => {
-  const entries = ref<HistoryEntry[]>(
-    JSON.parse(localStorage.getItem('medcalc-history') ?? '[]'),
-  )
+export const useHistoryStore = defineStore(
+  "history",
+  () => {
+    const entries = ref<HistoryEntry[]>(
+      JSON.parse(localStorage.getItem("medcalc-history") ?? "[]"),
+    );
 
-  function add(entry: Omit<HistoryEntry, 'id' | 'timestamp'>) {
-    entries.value.unshift({
-      ...entry,
-      id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
-    })
-    if (entries.value.length > MAX_ENTRIES) entries.value.pop()
-    localStorage.setItem('medcalc-history', JSON.stringify(entries.value))
-  }
+    function add(entry: Omit<HistoryEntry, "id" | "timestamp">) {
+      entries.value.unshift({
+        ...entry,
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+      });
+      if (entries.value.length > MAX_ENTRIES) entries.value.pop();
+      localStorage.setItem("medcalc-history", JSON.stringify(entries.value));
+    }
 
-  function clear() {
-    entries.value = []
-    localStorage.removeItem('medcalc-history')
-  }
+    function clear() {
+      entries.value = [];
+      localStorage.removeItem("medcalc-history");
+    }
 
-  const getByCalculator = (id: string) =>
-    entries.value.filter(e => e.calculatorId === id)
+    const getByCalculator = (id: string) =>
+      entries.value.filter((e) => e.calculatorId === id);
 
-  return { entries, add, clear, getByCalculator }
-}, { persist: true })
+    return { entries, add, clear, getByCalculator };
+  },
+  { persist: true },
+);
 ```
 
 ---
@@ -740,47 +776,49 @@ Mirror the `src/logic/` folder structure. Every calculator file gets a correspon
 
 **Minimum 4 cases per function:**
 
-| Case | What to assert |
-|------|---------------|
-| Normal result | `result.severity === 'normal'` + `value` within ± 0.01 of expected |
-| Critical result | `result.severity === 'critical'` |
-| Validation error | out-of-range input throws `CalcValidationError` with correct `field` |
-| Boundary value | value exactly at a classification threshold produces correct severity |
+| Case             | What to assert                                                        |
+| ---------------- | --------------------------------------------------------------------- |
+| Normal result    | `result.severity === 'normal'` + `value` within ± 0.01 of expected    |
+| Critical result  | `result.severity === 'critical'`                                      |
+| Validation error | out-of-range input throws `CalcValidationError` with correct `field`  |
+| Boundary value   | value exactly at a classification threshold produces correct severity |
 
 **Example — `tests/logic/antropometria/imc.test.ts`:**
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { calculateBmi } from '@/logic/calculators/antropometria/imc'
-import { CalcValidationError } from '@/logic/types'
+import { describe, it, expect } from "vitest";
+import { calculateBmi } from "@/logic/calculators/antropometria/imc";
+import { CalcValidationError } from "@/logic/types";
 
-describe('calculateBmi', () => {
-  it('returns normal for BMI 22.09', () => {
-    const r = calculateBmi({ weightKg: 70, heightM: 1.78 })
-    expect(r.value).toBeCloseTo(22.09, 1)
-    expect(r.severity).toBe('normal')
-    expect(r.interpretation).toBeTruthy()
-  })
+describe("calculateBmi", () => {
+  it("returns normal for BMI 22.09", () => {
+    const r = calculateBmi({ weightKg: 70, heightM: 1.78 });
+    expect(r.value).toBeCloseTo(22.09, 1);
+    expect(r.severity).toBe("normal");
+    expect(r.interpretation).toBeTruthy();
+  });
 
-  it('returns critical for Class III obesity', () => {
-    const r = calculateBmi({ weightKg: 130, heightM: 1.70 })
-    expect(r.severity).toBe('critical')
-  })
+  it("returns critical for Class III obesity", () => {
+    const r = calculateBmi({ weightKg: 130, heightM: 1.7 });
+    expect(r.severity).toBe("critical");
+  });
 
-  it('throws CalcValidationError for zero height', () => {
-    expect(() => calculateBmi({ weightKg: 70, heightM: 0 }))
-      .toThrow(CalcValidationError)
-  })
+  it("throws CalcValidationError for zero height", () => {
+    expect(() => calculateBmi({ weightKg: 70, heightM: 0 })).toThrow(
+      CalcValidationError,
+    );
+  });
 
-  it('boundary: BMI exactly 25.0 is overweight (attention)', () => {
+  it("boundary: BMI exactly 25.0 is overweight (attention)", () => {
     // 70 kg / (1.673m)² ≈ 25.0
-    const r = calculateBmi({ weightKg: 70, heightM: 1.673 })
-    expect(r.severity).toBe('attention')
-  })
-})
+    const r = calculateBmi({ weightKg: 70, heightM: 1.673 });
+    expect(r.severity).toBe("attention");
+  });
+});
 ```
 
 Run tests:
+
 ```bash
 npx vitest run                         # all tests
 npx vitest run --coverage              # coverage report (target ≥ 95%)

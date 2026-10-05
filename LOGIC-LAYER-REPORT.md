@@ -1,4 +1,4 @@
-# MedCalc — Logic Agent Implementation Report
+# MathForMed — Logic Agent Implementation Report
 
 **Branch:** `feat/calc-logic` · **Base:** `230697b` · **Implementation commit:** `f5b345f`
 **Scope:** `src/logic/**` and `src/stores/**` (per `.opencode/agents/logic-agent.md`)
@@ -8,7 +8,7 @@
 
 ## 1. Summary
 
-I implemented the complete pure-TypeScript domain layer for MedCalc: 24 medical
+I implemented the complete pure-TypeScript domain layer for MathForMed: 24 medical
 calculations, the shared type system, physiological validators, unit converters,
 two Pinia stores, and a 387-test suite with **100 % statement, branch, function and
 line coverage**.
