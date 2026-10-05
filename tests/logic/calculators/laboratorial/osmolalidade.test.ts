@@ -63,7 +63,7 @@ describe('calculateOsmolality', () => {
       'Glucose Contribution',
       'Urea Contribution',
     ])
-    expect(result.subResults?.[1].value).toBeCloseTo(5.6, 1)
+    expect(result.subResults?.[1]?.value).toBeCloseTo(5.6, 1)
   })
 
   it('throws CalcValidationError for out-of-range analytes', () => {

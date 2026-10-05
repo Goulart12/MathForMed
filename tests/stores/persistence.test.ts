@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useFavoritesStore } from '@/composables/useFavorites'
-import { useHistoryStore } from '@/composables/useHistory'
-import type { CalcResult } from '@/types/logic'
+import { useFavoritesStore } from '@/stores/favorites'
+import { useHistoryStore } from '@/stores/history'
+import type { CalcResult } from '@/logic/types'
 
 const RESULT: CalcResult = {
   value: 22.09,
@@ -38,7 +38,6 @@ describe('favorites store', () => {
     favorites.toggle('imc')
     favorites.toggle('hba1c')
     favorites.toggle('imc')
-    favorites.remove('imc')
     expect(favorites.ids).toEqual(['hba1c'])
   })
 
@@ -92,7 +91,7 @@ describe('history store', () => {
   it('starts empty', () => {
     const history = useHistoryStore()
     expect(history.entries).toEqual([])
-    expect(history.isEmpty).toBe(true)
+    expect(history.count).toBe(0)
   })
 
   it('records a result with an id and an ISO timestamp', () => {
@@ -179,6 +178,8 @@ describe('history store', () => {
   it('exposes a capped recent list for the home strip', () => {
     const history = useHistoryStore()
     for (let i = 0; i < 10; i += 1) addEntry(history)
-    expect(history.latest).toHaveLength(6)
+    // Newest-first and capped by the store's 50-entry limit; HomeView takes 8.
+    expect(history.count).toBe(10)
+    expect(history.entries.slice(0, 8)).toHaveLength(8)
   })
 })

@@ -3,6 +3,7 @@ import {
   hasStorage,
   randomId,
   readStorage,
+  readStringList,
   removeStorage,
   writeStorage,
 } from '@/stores/storage'
@@ -19,6 +20,27 @@ describe('storage wrappers', () => {
 
   it('reports storage availability', () => {
     expect(hasStorage()).toBe(true)
+  })
+
+  it('round-trips a list of strings', () => {
+    writeStorage('ids', ['imc', 'sofa'])
+    expect(readStringList('ids')).toEqual(['imc', 'sofa'])
+  })
+
+  it('drops entries of a list that are not strings', () => {
+    localStorage.setItem('ids', JSON.stringify(['imc', 42, null, { a: 1 }, 'sofa']))
+    expect(readStringList('ids')).toEqual(['imc', 'sofa'])
+  })
+
+  it('returns an empty list when the value is not a list', () => {
+    localStorage.setItem('ids', JSON.stringify({ imc: true }))
+    expect(readStringList('ids')).toEqual([])
+  })
+
+  it('returns an empty list when the key is absent or unparseable', () => {
+    expect(readStringList('missing')).toEqual([])
+    localStorage.setItem('ids', 'not json at all')
+    expect(readStringList('ids')).toEqual([])
   })
 
   it('round-trips a value', () => {

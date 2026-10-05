@@ -3,9 +3,8 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
-import type { DosePesoInput, UnitDoseUnit } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: DosePesoInput] }>()
+import type { DoseByWeightInput, UnitDoseUnit } from '@/logic/calculators/medicacao/dosePorPeso'
+const emit = defineEmits<{ calculate: [input: DoseByWeightInput] }>()
 
 const unitDoseUnit = ref<UnitDoseUnit>('mg/kg')
 const unitDose = ref<number | null>(null)

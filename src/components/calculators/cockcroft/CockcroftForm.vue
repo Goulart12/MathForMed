@@ -3,9 +3,8 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
-import type { CockcroftInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: CockcroftInput] }>()
+import type { CreatinineClearanceInput } from '@/logic/calculators/renal/creatininaClearance'
+const emit = defineEmits<{ calculate: [input: CreatinineClearanceInput] }>()
 
 const age = ref<number | null>(null)
 const weightKg = ref<number | null>(null)

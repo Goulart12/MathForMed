@@ -5,8 +5,7 @@ import AppInput from '@/components/ui/AppInput.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
 import ScoreRow from '@/components/ui/ScoreRow.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import type { FraminghamInput } from '@/types/calculator-inputs'
-
+import type { FraminghamInput } from '@/logic/calculators/cardiologia/framingham'
 const emit = defineEmits<{ calculate: [input: FraminghamInput] }>()
 
 const age = ref<number | null>(null)

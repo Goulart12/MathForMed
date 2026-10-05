@@ -71,14 +71,14 @@ describe('calculateHasBled', () => {
   it('lists the modifiable risks present as sub-results', () => {
     const result = calculateHasBled({ ...allAbsent, liverDisease: true })
     expect(result.subResults).toHaveLength(1)
-    expect(result.subResults?.[0].label).toMatch(/^L — Liver disease/)
-    expect(result.subResults?.[0].interpretation).toMatch(/cirrhosis/i)
+    expect(result.subResults?.[0]?.label).toMatch(/^L — Liver disease/)
+    expect(result.subResults?.[0]?.interpretation).toMatch(/cirrhosis/i)
   })
 
   it('reports zero modifiable risks when none are present', () => {
     const result = calculateHasBled(allAbsent)
-    expect(result.subResults?.[0].label).toBe('Modifiable Risks')
-    expect(result.subResults?.[0].value).toBe(0)
+    expect(result.subResults?.[0]?.label).toBe('Modifiable Risks')
+    expect(result.subResults?.[0]?.value).toBe(0)
   })
 
   it('does not throw for any boolean combination', () => {
@@ -90,8 +90,8 @@ describe('hasBledComponents', () => {
   it('returns nine criteria in display order', () => {
     const components = hasBledComponents(allAbsent)
     expect(components).toHaveLength(HAS_BLED_MAX)
-    expect(components[0].label).toMatch(/^H — Uncontrolled hypertension/)
-    expect(components[8].label).toMatch(/^D — Alcohol/)
+    expect(components[0]?.label).toMatch(/^H — Uncontrolled hypertension/)
+    expect(components[8]?.label).toMatch(/^D — Alcohol/)
   })
 
   it('maps each criterion to its input key', () => {

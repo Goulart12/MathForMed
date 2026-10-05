@@ -8,7 +8,7 @@ import {
   PhStethoscope,
 } from '@phosphor-icons/vue'
 import type { Component } from 'vue'
-import type { CalcCategory } from '@/types/logic'
+import type { CalcCategory } from '@/logic/types'
 
 export interface CategoryDef {
   slug: CalcCategory

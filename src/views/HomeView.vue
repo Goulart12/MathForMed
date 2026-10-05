@@ -8,12 +8,13 @@ import SectionHeader from '@/components/ui/SectionHeader.vue'
 import SeverityBadge from '@/components/ui/SeverityBadge.vue'
 import { CATEGORIES } from '@/data/categories'
 import { CALCULATORS_META, countByCategory } from '@/data/calculator-meta'
-import { useHistoryStore } from '@/composables/useHistory'
+import { useHistoryStore } from '@/stores/history'
 
 const history = useHistoryStore()
 
 const counts = countByCategory()
-const recent = computed(() => history.latest.slice(0, 8))
+// Newest-first already: `add` prepends, so the head of the list is the latest.
+const recent = computed(() => history.entries.slice(0, 8))
 
 /** `grid-cols-2` on every phone width; no breakpoint can reintroduce overflow. */
 </script>

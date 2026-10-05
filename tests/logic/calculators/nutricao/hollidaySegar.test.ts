@@ -31,7 +31,7 @@ describe('calculateHollidaySegar', () => {
   })
 
   it('reports the daily volume as a sub-result', () => {
-    expect(calculateHollidaySegar({ weightKg: 14 }).subResults?.[0].value).toBe(48 * 24)
+    expect(calculateHollidaySegar({ weightKg: 14 }).subResults?.[0]?.value).toBe(48 * 24)
   })
 
   it('caps the daily volume at 2500 mL and explains why', () => {
@@ -45,8 +45,8 @@ describe('calculateHollidaySegar', () => {
   it('does not cap below the ceiling', () => {
     // 50 kg → 90 mL/h → 2160 mL/day, below the cap.
     const result = calculateHollidaySegar({ weightKg: 50 })
-    expect(result.subResults?.[0].value).toBe(2160)
-    expect(result.subResults?.[0].interpretation).not.toContain('capped')
+    expect(result.subResults?.[0]?.value).toBe(2160)
+    expect(result.subResults?.[0]?.interpretation).not.toContain('capped')
   })
 
   it('reminds the clinician to account for ongoing losses', () => {

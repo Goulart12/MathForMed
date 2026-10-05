@@ -36,6 +36,23 @@ export function readStorage<T>(key: string): T | null {
 }
 
 /**
+ * Reads a persisted list of strings, such as the favourited calculator ids.
+ *
+ * Anything that is not a list of strings is discarded entry by entry, so a
+ * truncated write, a value left by an older build or a hand-edited entry cannot
+ * hand the consuming store something it cannot render.
+ *
+ * @param key - `localStorage` key.
+ * @returns The surviving string entries; empty when absent, unparseable, not a
+ *   list, or storage is unavailable.
+ */
+export function readStringList(key: string): string[] {
+  const parsed = readStorage<unknown>(key)
+  if (!Array.isArray(parsed)) return []
+  return parsed.filter((item): item is string => typeof item === 'string')
+}
+
+/**
  * JSON-serialises and writes a key.
  *
  * @param key - `localStorage` key.
@@ -79,9 +96,10 @@ export function randomId(): string {
 
   if (webCrypto && typeof webCrypto.getRandomValues === 'function') {
     const bytes = webCrypto.getRandomValues(new Uint8Array(16))
-    // RFC 4122 version 4 layout.
-    bytes[6] = (bytes[6] & 0x0f) | 0x40
-    bytes[8] = (bytes[8] & 0x3f) | 0x80
+    // RFC 4122 version 4 layout. The buffer was just allocated, so both slots
+    // are present; the fallbacks only satisfy the indexed-access types.
+    bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40
+    bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80
     const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
   }

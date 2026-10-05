@@ -3,7 +3,7 @@ import { computed, ref, useId } from 'vue'
 import { PhCaretDown } from '@phosphor-icons/vue'
 import SeverityBadge from './SeverityBadge.vue'
 import { severityTone } from '@/data/severity'
-import type { CalcResult } from '@/types/logic'
+import type { CalcResult } from '@/logic/types'
 
 const props = defineProps<{
   result: CalcResult

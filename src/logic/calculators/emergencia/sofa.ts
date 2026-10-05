@@ -9,7 +9,7 @@
  */
 
 import type { CalcResult, ReferenceRange } from '../../types'
-import { assertRange } from '../../utils/validators'
+import { assertDefined, assertRange } from '../../utils/validators'
 
 /** One organ system's 0–4 score. */
 export type SofaScore = 0 | 1 | 2 | 3 | 4
@@ -47,9 +47,9 @@ export const SOFA_MAX = 24
  *
  * @reference Singer M, Deutschman CS, Seymour CW, et al. The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3). JAMA. 2016;315(8):801–810.
  */
-export const SOFA_ICU_MORTALITY_BY_SCORE: readonly number[] = [
+export const SOFA_ICU_MORTALITY_BY_SCORE = [
   0, 0, 0, 15.7, 31, 40.5, 50, 53, 60, 65, 70, 75, 77, 78, 80,
-]
+] as const
 
 /**
  * ICU mortality by total SOFA score, expressed as ranges for the reference table.
@@ -193,9 +193,10 @@ function organScoreKey(
  */
 export function sofaIcuMortality(total: number): number {
   assertRange(total, 0, SOFA_MAX, 'total', 'points')
-  return SOFA_ICU_MORTALITY_BY_SCORE[
-    Math.min(Math.round(total), SOFA_ICU_MORTALITY_BY_SCORE.length - 1)
-  ]
+  const index = Math.min(Math.round(total), SOFA_ICU_MORTALITY_BY_SCORE.length - 1)
+  const mortality = SOFA_ICU_MORTALITY_BY_SCORE[index]
+  assertDefined(mortality, `mortality for a total of ${total}`)
+  return mortality
 }
 
 /** The valid 0–4 SOFA subscores, for building steppers in the form layer. */

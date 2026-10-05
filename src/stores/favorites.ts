@@ -10,13 +10,13 @@
 
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { readStorage, writeStorage, removeStorage } from './storage'
+import { readStringList, writeStorage, removeStorage } from './storage'
 
 /** `localStorage` key holding the favourited calculator ids. */
 export const FAVORITES_KEY = 'medcalc-favorites'
 
 export const useFavoritesStore = defineStore('favorites', () => {
-  const ids = ref<string[]>(readStorage<string[]>(FAVORITES_KEY) ?? [])
+  const ids = ref<string[]>(readStringList(FAVORITES_KEY))
 
   /** Number of favourited calculators. */
   const count = computed(() => ids.value.length)

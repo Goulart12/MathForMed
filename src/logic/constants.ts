@@ -357,4 +357,6 @@ export const CALCULATOR_IDS = Object.keys(CALCULATORS_META)
  * @param category - Category to filter by.
  */
 export const calculatorsByCategory = (category: CalcCategory): CalculatorMeta[] =>
-  CALCULATOR_IDS.map(id => CALCULATORS_META[id]).filter(m => m.category === category)
+  CALCULATOR_IDS.map(id => CALCULATORS_META[id]).filter(
+    (meta): meta is CalculatorMeta => meta !== undefined && meta.category === category,
+  )

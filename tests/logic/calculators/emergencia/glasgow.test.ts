@@ -42,9 +42,9 @@ describe('calculateGlasgow', () => {
       'Verbal response',
       'Motor response',
     ])
-    expect(result.subResults?.[0].interpretation).toBe('To verbal stimulus')
-    expect(result.subResults?.[1].interpretation).toBe('Confused conversation')
-    expect(result.subResults?.[2].interpretation).toBe('Localises pain')
+    expect(result.subResults?.[0]?.interpretation).toBe('To verbal stimulus')
+    expect(result.subResults?.[1]?.interpretation).toBe('Confused conversation')
+    expect(result.subResults?.[2]?.interpretation).toBe('Localises pain')
   })
 
   it('throws CalcValidationError for out-of-range component scores', () => {
@@ -99,12 +99,12 @@ describe('calculateGlasgow', () => {
 describe('GCS scales', () => {
   it('describes every eye score, highest first', () => {
     expect(EYES_SCALE.map(scale => scale.score)).toEqual([4, 3, 2, 1])
-    expect(EYES_SCALE[0].label).toBe('Spontaneous')
+    expect(EYES_SCALE[0]?.label).toBe('Spontaneous')
   })
 
   it('describes every verbal and motor score, highest first', () => {
     expect(VERBAL_SCALE.map(scale => scale.score)).toEqual([5, 4, 3, 2, 1])
     expect(MOTOR_SCALE.map(scale => scale.score)).toEqual([6, 5, 4, 3, 2, 1])
-    expect(MOTOR_SCALE[5].label).toBe('No motor response')
+    expect(MOTOR_SCALE[5]?.label).toBe('No motor response')
   })
 })

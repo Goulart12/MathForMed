@@ -63,14 +63,14 @@ describe('KDIGO_STAGES', () => {
 describe('KDIGO_REFERENCES', () => {
   it('exposes one reference band per stage, ordered G1 to G5', () => {
     expect(KDIGO_REFERENCES).toHaveLength(6)
-    expect(KDIGO_REFERENCES[0].label).toMatch(/^G1/)
-    expect(KDIGO_REFERENCES[5].label).toMatch(/^G5/)
+    expect(KDIGO_REFERENCES[0]?.label).toMatch(/^G1/)
+    expect(KDIGO_REFERENCES[5]?.label).toMatch(/^G5/)
   })
 
   it('carries min and max bounds matching the stages', () => {
-    expect(KDIGO_REFERENCES[0].min).toBe(90)
-    expect(KDIGO_REFERENCES[0].max).toBeUndefined()
-    expect(KDIGO_REFERENCES[5].max).toBe(14)
-    expect(KDIGO_REFERENCES[5].min).toBeUndefined()
+    expect(KDIGO_REFERENCES[0]?.min).toBe(90)
+    expect(KDIGO_REFERENCES[0]?.max).toBeUndefined()
+    expect(KDIGO_REFERENCES[5]?.max).toBe(14)
+    expect(KDIGO_REFERENCES[5]?.min).toBeUndefined()
   })
 })

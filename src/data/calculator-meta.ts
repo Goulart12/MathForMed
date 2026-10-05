@@ -1,16 +1,15 @@
 /**
- * TEMPORARY SHIM — design worktree only.
+ * Display metadata for every calculator, plus the search and grouping helpers
+ * the views need.
  *
- * Mirrors `src/logic/constants.ts` (`CALCULATORS_META`) from the `feat/calc-logic`
- * worktree. Home, category, search and favorites views all key off these ids, so
- * the ids here are the contract that must survive the merge byte-for-byte.
- *
- * MERGE: replace the body of this file with
- *   export { CALCULATORS_META } from '@/logic/constants'
- * and delete the local entries. Only `name` / `description` / `shortName` are
- * display copy; the ids and categories are what the rest of the app depends on.
+ * This registry is deliberately **not** a re-export of `src/logic/constants.ts`.
+ * The two carry different copy on purpose: the logic layer holds the domain
+ * reference (English, used by the documentation and the API), while this file
+ * holds the pt-BR copy the clinician actually reads in the app. Only the ids,
+ * their categories and their order are contractual, and
+ * `tests/architecture/boundaries.test.ts` fails the build if the two drift.
  */
-import type { CalculatorMeta } from '@/types/logic'
+import type { CalculatorMeta } from '@/logic/types'
 
 export const CALCULATORS_META: Record<string, CalculatorMeta> = {
   /* ---------------------------- antropometria ---------------------------- */

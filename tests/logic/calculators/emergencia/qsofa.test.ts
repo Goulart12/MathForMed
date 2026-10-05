@@ -37,7 +37,7 @@ describe('calculateQsofa', () => {
     const result = calculateQsofa({ respiratoryRate: 24, alteredMentation: true, sysBp: 88 })
     expect(result.subResults).toHaveLength(3)
     expect(result.subResults?.map(sub => sub.value)).toEqual([1, 1, 1])
-    expect(result.subResults?.[1].label).toContain('Altered mentation')
+    expect(result.subResults?.[1]?.label).toContain('Altered mentation')
   })
 
   it('throws CalcValidationError for out-of-range vital signs', () => {

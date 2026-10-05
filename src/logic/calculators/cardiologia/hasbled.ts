@@ -49,46 +49,50 @@ export interface HasBledComponent {
   present: boolean
 }
 
-const CRITERIA: readonly Omit<HasBledComponent, 'points' | 'present'>[] = [
+/**
+ * The nine criteria in display order. Each carries the input key it reads, so
+ * the criterion and its flag can never drift apart.
+ */
+const CRITERIA: readonly (Omit<HasBledComponent, 'points' | 'present'> & {
+  key: keyof HasBledInput
+})[] = [
   {
     label: 'H — Uncontrolled hypertension',
     description: 'Systolic BP > 160 mmHg',
+    key: 'hypertensionUncontrolled',
   },
   {
     label: 'R — Renal disease',
     description: 'Dialysis or creatinine > 2.26 mg/dL',
+    key: 'renalDisease',
   },
   {
     label: 'L — Liver disease',
     description: 'Cirrhosis, bilirubin > 2× ULN or ALT > 3× ULN',
+    key: 'liverDisease',
   },
-  { label: 'S — Stroke history', description: 'Previous stroke or systemic embolism' },
+  {
+    label: 'S — Stroke history',
+    description: 'Previous stroke or systemic embolism',
+    key: 'strokeHistory',
+  },
   {
     label: 'B — Bleeding history',
     description: 'Previous bleeding or a bleeding predisposition',
+    key: 'bleedingHistory',
   },
-  { label: 'L — Labile INR', description: 'Time in therapeutic range < 60%' },
-  { label: 'E — Elderly', description: 'Age > 65 years' },
+  { label: 'L — Labile INR', description: 'Time in therapeutic range < 60%', key: 'labileInr' },
+  { label: 'E — Elderly', description: 'Age > 65 years', key: 'elderly' },
   {
     label: 'D — Drugs',
     description: 'Antiplatelet therapy or NSAIDs',
+    key: 'drugsAntiplatelet',
   },
   {
     label: 'D — Alcohol',
     description: 'Eight or more units of alcohol per week',
+    key: 'alcoholUse',
   },
-]
-
-const INPUT_KEYS: readonly (keyof HasBledInput)[] = [
-  'hypertensionUncontrolled',
-  'renalDisease',
-  'liverDisease',
-  'strokeHistory',
-  'bleedingHistory',
-  'labileInr',
-  'elderly',
-  'drugsAntiplatelet',
-  'alcoholUse',
 ]
 
 /**
@@ -154,8 +158,8 @@ export function calculateHasBled(input: HasBledInput): CalcResult {
  * @reference Pisters R, Lane DA, Gagnier JJ, et al. A novel risk factor model to predict stroke risk in atrial fibrillation. Chest. 2010;138(5):1093–1100.
  */
 export function hasBledComponents(input: HasBledInput): HasBledComponent[] {
-  return CRITERIA.map((criterion, index) => {
-    const present = Boolean(input[INPUT_KEYS[index]])
+  return CRITERIA.map(({ key, ...criterion }) => {
+    const present = Boolean(input[key])
     return { ...criterion, points: present ? 1 : 0, present }
   })
 }

@@ -5,9 +5,9 @@ import { PhClockCounterClockwise, PhTrash } from '@phosphor-icons/vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import SeverityBadge from '@/components/ui/SeverityBadge.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import { useHistoryStore } from '@/composables/useHistory'
+import { useHistoryStore } from '@/stores/history'
 import { useToast } from '@/composables/useToast'
-import type { HistoryEntry } from '@/composables/useHistory'
+import type { HistoryEntry } from '@/stores/history'
 
 const history = useHistoryStore()
 const toast = useToast()
@@ -51,7 +51,7 @@ function entryValue(entry: HistoryEntry): string {
 
     <div class="mx-auto max-w-3xl space-y-4 p-4">
       <div
-        v-if="history.isEmpty"
+        v-if="history.count === 0"
         class="flex flex-col items-center gap-3 rounded-lg border border-line bg-white p-8 text-center shadow-card"
       >
         <svg

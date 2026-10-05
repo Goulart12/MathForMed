@@ -4,9 +4,8 @@ import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
-import type { GotejamentoInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: GotejamentoInput] }>()
+import type { DripRateInput } from '@/logic/calculators/medicacao/gotejamento'
+const emit = defineEmits<{ calculate: [input: DripRateInput] }>()
 
 const volumeMl = ref<number | null>(null)
 const duration = ref<number | null>(null)

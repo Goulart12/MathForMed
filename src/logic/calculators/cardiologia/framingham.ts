@@ -10,7 +10,7 @@
  */
 
 import type { CalcResult, ReferenceRange, Severity } from '../../types'
-import { assertOneOf, assertRange } from '../../utils/validators'
+import { assertDefined, assertOneOf, assertRange } from '../../utils/validators'
 
 /** Inputs for {@link calculateFramingham}. */
 export interface FraminghamInput {
@@ -36,6 +36,30 @@ const SEXES: readonly ('M' | 'F')[] = ['M', 'F']
 
 /** Age columns used by the cholesterol and smoking tables: 20–39 … 70–79. */
 type AgeColumn = 0 | 1 | 2 | 3 | 4
+
+/** One row of the total-cholesterol table, holding a point value per age column. */
+type AgeColumnPoints = readonly [number, number, number, number, number]
+
+/** The five total-cholesterol rows, indexed by {@link CholesterolRow}. */
+type CholesterolTable = readonly [
+  AgeColumnPoints,
+  AgeColumnPoints,
+  AgeColumnPoints,
+  AgeColumnPoints,
+  AgeColumnPoints,
+]
+
+/** Index of a total-cholesterol row: <160, 160–199, 200–239, 240–279, ≥280 mg/dL. */
+type CholesterolRow = 0 | 1 | 2 | 3 | 4
+
+/** Index of the four HDL bands: <40, 40–49, 50–59, ≥60 mg/dL. */
+type HdlBand = 0 | 1 | 2 | 3
+
+/**
+ * Index of the five systolic blood pressure bands:
+ * <120, 120–129, 130–139, 140–159, ≥160 mmHg.
+ */
+type SbpBand = 0 | 1 | 2 | 3 | 4
 
 /**
  * Age at the start of each column band, indexed by {@link AgeColumn}.
@@ -67,7 +91,7 @@ const SATURATION_POINTS = { M: 17, F: 25 } as const
  * Total cholesterol points, indexed by row then age column.
  * Rows: <160, 160–199, 200–239, 240–279, ≥280 mg/dL.
  */
-const TOTAL_CHOLESTEROL_POINTS: Record<'M' | 'F', readonly (readonly number[])[]> = {
+const TOTAL_CHOLESTEROL_POINTS: Record<'M' | 'F', CholesterolTable> = {
   M: [
     [0, 0, 0, 0, 0],
     [4, 3, 2, 1, 0],
@@ -85,7 +109,7 @@ const TOTAL_CHOLESTEROL_POINTS: Record<'M' | 'F', readonly (readonly number[])[]
 }
 
 /** Smoking points for current smokers, indexed by age column. */
-const SMOKER_POINTS: Record<'M' | 'F', readonly number[]> = {
+const SMOKER_POINTS: Record<'M' | 'F', AgeColumnPoints> = {
   M: [8, 5, 3, 1, 1],
   F: [9, 7, 4, 2, 1],
 }
@@ -112,7 +136,7 @@ const SBP_POINTS: Record<
 }
 
 /** Index into the five systolic blood pressure bands. */
-function sbpBand(sysBpMmhg: number): number {
+function sbpBand(sysBpMmhg: number): SbpBand {
   if (sysBpMmhg < 120) return 0
   if (sysBpMmhg < 130) return 1
   if (sysBpMmhg < 140) return 2
@@ -121,7 +145,7 @@ function sbpBand(sysBpMmhg: number): number {
 }
 
 /** Index into the four HDL bands. */
-function hdlBand(hdlCholesterolMgDl: number): number {
+function hdlBand(hdlCholesterolMgDl: number): HdlBand {
   if (hdlCholesterolMgDl < 40) return 0
   if (hdlCholesterolMgDl < 50) return 1
   if (hdlCholesterolMgDl < 60) return 2
@@ -177,18 +201,20 @@ function agePoints(age: number, sex: 'M' | 'F'): number {
   // Beyond the published range (age ≥ 80) the score keeps rising one point per
   // year until the risk table saturates.
   const saturated = SATURATION_POINTS[sex]
-  return Math.min(AGE_BANDS[AGE_BANDS.length - 1].points[sex] + (age - PUBLISHED_MAX_AGE), saturated)
+  const highestBand = AGE_BANDS[AGE_BANDS.length - 1]
+  assertDefined(highestBand, 'the published age bands')
+  return Math.min(highestBand.points[sex] + (age - PUBLISHED_MAX_AGE), saturated)
 }
 
 function ageColumn(age: number): AgeColumn {
-  let column = 0
-  for (let index = 0; index < AGE_COLUMN_STARTS.length; index += 1) {
-    if (age >= AGE_COLUMN_STARTS[index]) column = index
+  let column: AgeColumn = 0
+  for (const [index, start] of AGE_COLUMN_STARTS.entries()) {
+    if (age >= start) column = index as AgeColumn
   }
-  return column as AgeColumn
+  return column
 }
 
-function cholesterolRow(totalCholesterolMgDl: number): number {
+function cholesterolRow(totalCholesterolMgDl: number): CholesterolRow {
   if (totalCholesterolMgDl < 160) return 0
   if (totalCholesterolMgDl < 200) return 1
   if (totalCholesterolMgDl < 240) return 2
@@ -260,10 +286,14 @@ export function framinghamBreakdown(input: FraminghamInput): FraminghamBreakdown
   const totalPoints = components.reduce((total, component) => total + component.points, 0)
   const riskTable = RISK_BY_POINT[sex]
 
+  // Totals outside the published range clamp to the saturating end of the table.
+  const clampedIndex = Math.min(Math.max(totalPoints, 0), riskTable.length - 1)
+  const riskPercent = riskTable[clampedIndex]
+  assertDefined(riskPercent, `the risk table for sex '${sex}'`)
+
   return {
     totalPoints,
-    // Totals outside the published range clamp to the saturating end of the table.
-    riskPercent: riskTable[Math.min(Math.max(totalPoints, 0), riskTable.length - 1)],
+    riskPercent,
     belowOnePercent: totalPoints < BELOW_ONE_AT[sex],
     components,
   }

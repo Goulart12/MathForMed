@@ -2,8 +2,7 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { Hba1cInput } from '@/types/calculator-inputs'
-
+import type { Hba1cInput } from '@/logic/calculators/laboratorial/hba1c'
 const emit = defineEmits<{ calculate: [input: Hba1cInput] }>()
 
 const hba1cPercent = ref<number | null>(null)

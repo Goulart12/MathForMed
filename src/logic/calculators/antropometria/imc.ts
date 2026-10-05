@@ -36,13 +36,16 @@ export interface BmiBand {
   severity: Severity
 }
 
+/** Highest band — unbounded above, and the fallback when nothing else matches. */
+const HIGHEST_BAND: BmiBand = { max: Infinity, label: 'Obesity class III', severity: 'critical' }
+
 const BANDS: readonly BmiBand[] = [
   { max: 18.5, label: 'Underweight', severity: 'attention' },
   { max: 25, label: 'Normal weight', severity: 'normal' },
   { max: 30, label: 'Overweight', severity: 'attention' },
   { max: 35, label: 'Obesity class I', severity: 'attention' },
   { max: 40, label: 'Obesity class II', severity: 'critical' },
-  { max: Infinity, label: 'Obesity class III', severity: 'critical' },
+  HIGHEST_BAND,
 ]
 
 /**
@@ -52,7 +55,7 @@ const BANDS: readonly BmiBand[] = [
  * @returns The band whose exclusive upper bound the value falls under.
  */
 export function classifyBmi(bmi: number): BmiBand {
-  return BANDS.find(b => bmi < b.max) ?? BANDS[BANDS.length - 1]
+  return BANDS.find(b => bmi < b.max) ?? HIGHEST_BAND
 }
 
 /**

@@ -3,9 +3,9 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import CalculatorView from '@/views/CalculatorView.vue'
-import { useFavoritesStore } from '@/composables/useFavorites'
-import { useHistoryStore } from '@/composables/useHistory'
-import { CalcValidationError, type CalcResult } from '@/types/logic'
+import { useFavoritesStore } from '@/stores/favorites'
+import { useHistoryStore } from '@/stores/history'
+import { CalcValidationError, type CalcResult } from '@/logic/types'
 
 /** Stubs vue-router so the view can mount without a real router. */
 const push = vi.fn()
