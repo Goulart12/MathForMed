@@ -9,7 +9,8 @@
  */
 
 import type { CalcResult, ReferenceRange } from '../../types'
-import { assertRange } from '../../utils/validators'
+import { assertDefined, assertRange } from '../../utils/validators'
+import { pluralize } from '../../utils/units'
 
 /** One organ system's 0–4 score. */
 export type SofaScore = 0 | 1 | 2 | 3 | 4
@@ -33,9 +34,9 @@ export interface SofaInput {
 const SCORE_TIERS: readonly SofaScore[] = [0, 1, 2, 3, 4]
 
 export const SOFA_REFERENCES: ReferenceRange[] = [
-  { label: '0–6 — low organ dysfunction', min: 0, max: 6, severity: 'normal' },
-  { label: '7–9 — moderate organ dysfunction', min: 7, max: 9, severity: 'attention' },
-  { label: '≥ 10 — high organ dysfunction', min: 10, max: 24, severity: 'critical' },
+  { label: '0–6 — disfunção orgânica baixa', min: 0, max: 6, severity: 'normal' },
+  { label: '7–9 — disfunção orgânica moderada', min: 7, max: 9, severity: 'attention' },
+  { label: '≥ 10 — disfunção orgânica alta', min: 10, max: 24, severity: 'critical' },
 ]
 
 /** Maximum achievable total, six organs × 4 points. */
@@ -47,9 +48,9 @@ export const SOFA_MAX = 24
  *
  * @reference Singer M, Deutschman CS, Seymour CW, et al. The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3). JAMA. 2016;315(8):801–810.
  */
-export const SOFA_ICU_MORTALITY_BY_SCORE: readonly number[] = [
+export const SOFA_ICU_MORTALITY_BY_SCORE = [
   0, 0, 0, 15.7, 31, 40.5, 50, 53, 60, 65, 70, 75, 77, 78, 80,
-]
+] as const
 
 /**
  * ICU mortality by total SOFA score, expressed as ranges for the reference table.
@@ -67,30 +68,30 @@ export const SOFA_ORGAN_SCALES = {
   respiration: [
     'PaO₂/FiO₂ ≥ 400',
     '< 400',
-    '< 300 with respiratory support',
-    '< 200 with respiratory support',
-    '< 100 with respiratory support',
+    '< 300 com suporte respiratório',
+    '< 200 com suporte respiratório',
+    '< 100 com suporte respiratório',
   ],
   coagulation: [
-    'Platelets ≥ 150 ×10³/µL',
+    'Plaquetas ≥ 150 ×10³/µL',
     '< 150 ×10³/µL',
     '< 100 ×10³/µL',
     '< 50 ×10³/µL',
     '< 20 ×10³/µL',
   ],
   liver: [
-    'Bilirubin < 1.2 mg/dL',
+    'Bilirrubina < 1.2 mg/dL',
     '1.2–1.9 mg/dL',
     '2.0–5.9 mg/dL',
     '6.0–11.9 mg/dL',
     '≥ 12.0 mg/dL',
   ],
   cardiovascular: [
-    'MAP ≥ 70 mmHg',
-    'MAP < 70 mmHg',
-    'Dopamine ≤ 5 or dobutamine, or any vasopressor',
-    'Dopamine > 5, or epinephrine ≤ 0.1, or norepinephrine ≤ 0.1',
-    'Dopamine > 10, or epinephrine > 0.1, or norepinephrine > 0.1',
+    'PAM ≥ 70 mmHg',
+    'PAM < 70 mmHg',
+    'Dopamina ≤ 5 ou dobutamina, ou qualquer vasopressor',
+    'Dopamina > 5, ou epinefrina ≤ 0.1, ou noradrenalina ≤ 0.1',
+    'Dopamina > 10, ou epinefrina > 0.1, ou noradrenalina > 0.1',
   ],
   cns: [
     'GCS 15',
@@ -100,11 +101,11 @@ export const SOFA_ORGAN_SCALES = {
     'GCS < 6',
   ],
   renal: [
-    'Creatinine < 1.2 mg/dL',
+    'Creatinina < 1.2 mg/dL',
     '1.2–1.9 mg/dL',
-    '2.0–3.4 mg/dL, or urine output < 500 mL/day',
-    '3.5–4.9 mg/dL, or urine output < 200 mL/day',
-    '≥ 5.0 mg/dL, or urine output < 100 mL/day',
+    '2.0–3.4 mg/dL, ou diurese < 500 mL/dia',
+    '3.5–4.9 mg/dL, ou diurese < 200 mL/dia',
+    '≥ 5.0 mg/dL, ou diurese < 100 mL/dia',
   ],
 } as const
 
@@ -119,11 +120,11 @@ const ORGAN_KEYS: readonly (keyof SofaInput)[] = [
 ]
 
 const ORGAN_LABELS: Record<keyof SofaInput, string> = {
-  respirationScore: 'Respiration',
-  coagulationScore: 'Coagulation',
-  liverScore: 'Liver',
+  respirationScore: 'Respiração',
+  coagulationScore: 'Coagulação',
+  liverScore: 'Fígado',
   cardiovascularScore: 'Cardiovascular',
-  cnsScore: 'Central nervous system',
+  cnsScore: 'Sistema nervoso central',
   renalScore: 'Renal',
 }
 
@@ -148,7 +149,7 @@ const ORGAN_LABELS: Record<keyof SofaInput, string> = {
 export function calculateSofa(input: SofaInput): CalcResult {
   const organs = ORGAN_KEYS.map(key => {
     const score = input[key]
-    assertRange(score, 0, 4, key, 'points')
+    assertRange(score, 0, 4, key, 'pontos')
     return { key, score }
   })
 
@@ -157,20 +158,20 @@ export function calculateSofa(input: SofaInput): CalcResult {
   const mortality = sofaIcuMortality(total)
 
   return {
-    label: 'SOFA Score',
+    label: 'Escore SOFA',
     value: total,
-    unit: 'points',
+    unit: pluralize(total, 'ponto'),
     severity,
-    interpretation: `SOFA ${total} of ${SOFA_MAX} — ${total >= 10 ? 'high' : total >= 7 ? 'moderate' : 'low'} organ dysfunction. Reported ICU mortality for this score in the Sepsis-3 trial was approximately ${mortality}%.${
+    interpretation: `SOFA ${total} de ${SOFA_MAX} — disfunção orgânica ${total >= 10 ? 'alta' : total >= 7 ? 'moderada' : 'baixa'}. A mortalidade na UTI relatada para este escore no estudo Sepsis-3 foi de aproximadamente ${mortality}%.${
       total >= 10
-        ? ' Escalate organ support and reassess within hours.'
+        ? ' Intensifique o suporte orgânico e reavalie em poucas horas.'
         : ''
     }`,
     references: SOFA_REFERENCES,
     subResults: organs.map(organ => ({
       label: ORGAN_LABELS[organ.key],
       value: organ.score,
-      unit: 'points',
+      unit: pluralize(organ.score, 'ponto'),
       severity: (organ.score > 0 ? 'attention' : 'info') as 'attention' | 'info',
       interpretation: SOFA_ORGAN_SCALES[organScoreKey(organ.key)][organ.score],
     })),
@@ -192,10 +193,11 @@ function organScoreKey(
  * @reference Singer M, Deutschman CS, Seymour CW, et al. The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3). JAMA. 2016;315(8):801–810.
  */
 export function sofaIcuMortality(total: number): number {
-  assertRange(total, 0, SOFA_MAX, 'total', 'points')
-  return SOFA_ICU_MORTALITY_BY_SCORE[
-    Math.min(Math.round(total), SOFA_ICU_MORTALITY_BY_SCORE.length - 1)
-  ]
+  assertRange(total, 0, SOFA_MAX, 'total', 'pontos')
+  const index = Math.min(Math.round(total), SOFA_ICU_MORTALITY_BY_SCORE.length - 1)
+  const mortality = SOFA_ICU_MORTALITY_BY_SCORE[index]
+  assertDefined(mortality, `mortality for a total of ${total}`)
+  return mortality
 }
 
 /** The valid 0–4 SOFA subscores, for building steppers in the form layer. */

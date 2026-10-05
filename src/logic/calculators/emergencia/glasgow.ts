@@ -6,6 +6,7 @@
 
 import type { CalcResult, ReferenceRange } from '../../types'
 import { assertOneOf } from '../../utils/validators'
+import { pluralize } from '../../utils/units'
 
 /** Eye opening score. */
 export type GlasgowEyes = 1 | 2 | 3 | 4
@@ -29,36 +30,36 @@ const VERBAL: readonly GlasgowVerbal[] = [1, 2, 3, 4, 5]
 const MOTOR: readonly GlasgowMotor[] = [1, 2, 3, 4, 5, 6]
 
 export const GLASGOW_REFERENCES: ReferenceRange[] = [
-  { label: 'Severe TBI (3–8)', min: 3, max: 8, severity: 'critical' },
-  { label: 'Moderate TBI (9–12)', min: 9, max: 12, severity: 'attention' },
-  { label: 'Mild TBI (13–15)', min: 13, max: 15, severity: 'attention' },
+  { label: 'TCE grave (3–8)', min: 3, max: 8, severity: 'critical' },
+  { label: 'TCE moderado (9–12)', min: 9, max: 12, severity: 'attention' },
+  { label: 'TCE leve (13–15)', min: 13, max: 15, severity: 'attention' },
 ]
 
 /** Eye-opening descriptors, keyed by score. */
 export const EYES_LABELS: Record<GlasgowEyes, string> = {
-  4: 'Spontaneous',
-  3: 'To verbal stimulus',
-  2: 'To pain',
-  1: 'No response',
+  4: 'Espontânea',
+  3: 'Ao estímulo verbal',
+  2: 'À dor',
+  1: 'Sem resposta',
 }
 
 /** Verbal-response descriptors, keyed by score. */
 export const VERBAL_LABELS: Record<GlasgowVerbal, string> = {
-  5: 'Oriented',
-  4: 'Confused conversation',
-  3: 'Inappropriate words',
-  2: 'Incomprehensible sounds',
-  1: 'No verbal response',
+  5: 'Orientado',
+  4: 'Conversa confusa',
+  3: 'Palavras inapropriadas',
+  2: 'Sons incompreensíveis',
+  1: 'Sem resposta verbal',
 }
 
 /** Motor-response descriptors, keyed by score. */
 export const MOTOR_LABELS: Record<GlasgowMotor, string> = {
-  6: 'Obeys commands',
-  5: 'Localises pain',
-  4: 'Withdrawal from pain',
-  3: 'Abnormal flexion',
-  2: 'Extension to pain',
-  1: 'No motor response',
+  6: 'Obedece comandos',
+  5: 'Localiza a dor',
+  4: 'Retirada à dor',
+  3: 'Flexão anormal',
+  2: 'Extensão à dor',
+  1: 'Sem resposta motora',
 }
 
 /** Descriptions of each eye-opening score, highest first, for the form. */
@@ -120,38 +121,38 @@ export function calculateGlasgow(input: GlasgowInput): CalcResult {
 
   // Mild and moderate TBI both warrant attention; only severe TBI is critical.
   const severity = total >= 9 ? 'attention' : 'critical'
-  const grade = total >= 13 ? 'Mild TBI' : total >= 9 ? 'Moderate TBI' : 'Severe TBI'
+  const grade = total >= 13 ? 'TCE leve' : total >= 9 ? 'TCE moderado' : 'TCE grave'
 
   return {
-    label: 'Glasgow Coma Scale',
+    label: 'Escala de Coma de Glasgow',
     value: total,
-    unit: 'points',
+    unit: pluralize(total, 'ponto'),
     severity,
     interpretation: `GCS ${total} (E${eyes} V${verbal} M${motor}) — ${grade}. ${
       total < 9
-        ? 'A total of 8 or below defines coma and is an indication for airway protection and urgent neuroimaging in head injury.'
-        : 'Monitor for changes; a fall of 2 or more points requires reassessment and imaging.'
+        ? 'Um total de 8 ou menos define coma e é indicação de proteção das vias aéreas e de neuroimagem urgente no traumatismo craniano.'
+        : 'Monitore mudanças; uma queda de 2 ou mais pontos exige reavaliação e imagem.'
     }`,
     references: GLASGOW_REFERENCES,
     subResults: [
       {
-        label: 'Eye opening',
+        label: 'Abertura ocular',
         value: eyes,
-        unit: 'points',
+        unit: pluralize(eyes, 'ponto'),
         severity: 'info',
         interpretation: EYES_LABELS[eyes],
       },
       {
-        label: 'Verbal response',
+        label: 'Resposta verbal',
         value: verbal,
-        unit: 'points',
+        unit: pluralize(verbal, 'ponto'),
         severity: 'info',
         interpretation: VERBAL_LABELS[verbal],
       },
       {
-        label: 'Motor response',
+        label: 'Resposta motora',
         value: motor,
-        unit: 'points',
+        unit: pluralize(motor, 'ponto'),
         severity: 'info',
         interpretation: MOTOR_LABELS[motor],
       },

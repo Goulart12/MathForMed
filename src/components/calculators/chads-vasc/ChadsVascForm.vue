@@ -5,8 +5,7 @@ import AppInput from '@/components/ui/AppInput.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
 import ScoreRow from '@/components/ui/ScoreRow.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import type { ChadsVascInput } from '@/types/calculator-inputs'
-
+import type { ChadsVascInput } from '@/logic/calculators/cardiologia/chadsVasc'
 const emit = defineEmits<{ calculate: [input: ChadsVascInput] }>()
 
 const age = ref<number | null>(null)

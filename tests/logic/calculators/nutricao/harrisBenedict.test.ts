@@ -17,9 +17,9 @@ const baseline = {
 describe('calculateHarrisBenedict', () => {
   it('returns 2628 kcal/day for a 70 kg, 175 cm, 30-year-old male at moderate activity', () => {
     const result = calculateHarrisBenedict(baseline)
-    expect(result.label).toBe('Total Daily Energy Expenditure')
+    expect(result.label).toBe('Gasto Energético Diário Total')
     expect(result.value).toBe(2628)
-    expect(result.unit).toBe('kcal/day')
+    expect(result.unit).toBe('kcal/dia')
     expect(result.severity).toBe('info')
   })
 
@@ -30,11 +30,11 @@ describe('calculateHarrisBenedict', () => {
 
   it('reports the BMR, activity level and protein target as sub-results', () => {
     const result = calculateHarrisBenedict(baseline)
-    expect(result.subResults?.find(sub => sub.label === 'Resting Metabolic Rate')?.value).toBe(
+    expect(result.subResults?.find(sub => sub.label === 'Taxa Metabólica de Repouso')?.value).toBe(
       1696,
     )
-    expect(result.subResults?.find(sub => sub.label === 'Activity Level')?.value).toBe(1.55)
-    expect(result.subResults?.find(sub => sub.label === 'Protein Target')?.value).toBe(
+    expect(result.subResults?.find(sub => sub.label === 'Nível de atividade')?.value).toBe(1.55)
+    expect(result.subResults?.find(sub => sub.label === 'Alvo de proteína')?.value).toBe(
       PROTEIN_G_PER_KG * 70,
     )
   })
@@ -45,7 +45,7 @@ describe('calculateHarrisBenedict', () => {
     // 2628.28 × 1.3 = 3416.76 → 3417
     expect(withStress.value).toBe(3417)
     expect(withStress.value).toBeGreaterThan(Number(without.value))
-    expect(withStress.interpretation).toContain('stress 1.3')
+    expect(withStress.interpretation).toContain('estresse 1.3')
   })
 
   it('scales the requirement with the activity factor', () => {

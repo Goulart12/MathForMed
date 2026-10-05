@@ -2,8 +2,7 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { AnionGapInput } from '@/types/calculator-inputs'
-
+import type { AnionGapInput } from '@/logic/calculators/laboratorial/anionGap'
 const emit = defineEmits<{ calculate: [input: AnionGapInput] }>()
 
 const sodium = ref<number | null>(null)

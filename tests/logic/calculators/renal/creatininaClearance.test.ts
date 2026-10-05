@@ -13,7 +13,7 @@ describe('calculateCreatinineClearance', () => {
       serumCreatinineMgDl: 1.2,
       sex: 'M',
     })
-    expect(result.label).toBe('Creatinine Clearance')
+    expect(result.label).toBe('Depuração de Creatinina')
     expect(result.value).toBeCloseTo(56.7, 1)
     expect(result.unit).toBe('mL/min')
     expect(result.severity).toBe('attention')
@@ -35,7 +35,7 @@ describe('calculateCreatinineClearance', () => {
     })
     expect(Number(female.value)).toBeCloseTo(Number(male.value) * FEMALE_FACTOR, 1)
     expect(
-      female.subResults?.find(sub => sub.label === 'Sex Factor')?.value,
+      female.subResults?.find(sub => sub.label === 'Fator por sexo')?.value,
     ).toBe(FEMALE_FACTOR)
   })
 
@@ -47,7 +47,7 @@ describe('calculateCreatinineClearance', () => {
       sex: 'M',
     })
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('preserved')
+    expect(result.interpretation).toContain('preservada')
   })
 
   it('returns critical severity below 15 mL/min', () => {

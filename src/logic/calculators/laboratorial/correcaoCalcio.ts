@@ -23,11 +23,11 @@ export const CALCIUM_CORRECTION_FACTOR = 0.8
 export const ALBUMIN_REFERENCE = 4
 
 export const CORRECTED_CALCIUM_REFERENCES: ReferenceRange[] = [
-  { label: 'Critical low (< 7.5 mg/dL)', max: 7.5, severity: 'critical' },
-  { label: 'Low (7.5–8.5 mg/dL)', min: 7.5, max: 8.5, severity: 'attention' },
+  { label: 'Crítico baixo (< 7.5 mg/dL)', max: 7.5, severity: 'critical' },
+  { label: 'Baixo (7.5–8.5 mg/dL)', min: 7.5, max: 8.5, severity: 'attention' },
   { label: 'Normal (8.5–10.5 mg/dL)', min: 8.5, max: 10.5, severity: 'normal' },
-  { label: 'High (10.5–12 mg/dL)', min: 10.5, max: 12, severity: 'attention' },
-  { label: 'Critical high (> 12 mg/dL)', min: 12, severity: 'critical' },
+  { label: 'Alto (10.5–12 mg/dL)', min: 10.5, max: 12, severity: 'attention' },
+  { label: 'Crítico alto (> 12 mg/dL)', min: 12, severity: 'critical' },
 ]
 
 /**
@@ -60,32 +60,32 @@ export function calculateCorrectedCalcium(input: CorrectedCalciumInput): CalcRes
     rounded < 7.5 || rounded > 12 ? 'critical' : rounded < 8.5 || rounded > 10.5 ? 'attention' : 'normal'
   const classification =
     rounded < 7.5
-      ? 'critical hypocalcaemia'
+      ? 'hipocalcemia crítica'
       : rounded > 12
-        ? 'critical hypercalcaemia'
+        ? 'hipercalcemia crítica'
         : rounded < 8.5
-          ? 'hypocalcaemia'
+          ? 'hipocalcemia'
           : rounded > 10.5
-            ? 'hypercalcaemia'
-            : 'normal calcium'
+            ? 'hipercalcemia'
+            : 'cálcio normal'
 
   return {
-    label: 'Corrected Calcium',
+    label: 'Cálcio corrigido',
     value: rounded,
     unit: 'mg/dL',
     severity,
-    interpretation: `Corrected calcium ${rounded} mg/dL — ${classification}, against a reference of 8.5 to 10.5 mg/dL. Albumin ${albuminGDl} g/dL required a correction of ${round(corrected - measuredCalciumMgDl, 1)} mg/dL.`,
+    interpretation: `Cálcio corrigido ${rounded} mg/dL — ${classification}, contra uma referência de 8.5 a 10.5 mg/dL. Albumina ${albuminGDl} g/dL exigiu uma correção de ${round(corrected - measuredCalciumMgDl, 1)} mg/dL.`,
     references: CORRECTED_CALCIUM_REFERENCES,
     subResults: [
       {
-        label: 'Measured Calcium',
+        label: 'Cálcio medido',
         value: measuredCalciumMgDl,
         unit: 'mg/dL',
         severity: 'info',
-        interpretation: `Total calcium reported by the laboratory.`,
+        interpretation: `Cálcio total informado pelo laboratório.`,
       },
       {
-        label: 'Correction Applied',
+        label: 'Correção aplicada',
         value: round(corrected - measuredCalciumMgDl, 1),
         unit: 'mg/dL',
         severity: 'info',

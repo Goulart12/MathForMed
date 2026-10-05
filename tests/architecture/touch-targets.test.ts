@@ -24,9 +24,9 @@ import FavoritesView from '@/views/FavoritesView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import { CATEGORIES } from '@/data/categories'
 import { CALCULATORS_META } from '@/data/calculator-meta'
-import { useFavoritesStore } from '@/composables/useFavorites'
-import { useHistoryStore } from '@/composables/useHistory'
-import type { CalcResult } from '@/types/logic'
+import { useFavoritesStore } from '@/stores/favorites'
+import { useHistoryStore } from '@/stores/history'
+import type { CalcResult } from '@/logic/types'
 
 /**
  * Enforces the agent's hard rule that every interactive element offers at least

@@ -18,12 +18,12 @@ export interface BmiInput {
 
 /** WHO adult BMI bands. */
 export const BMI_REFERENCES: ReferenceRange[] = [
-  { label: 'Underweight', max: 18.5, severity: 'attention' },
-  { label: 'Normal weight', min: 18.5, max: 25, severity: 'normal' },
-  { label: 'Overweight', min: 25, max: 30, severity: 'attention' },
-  { label: 'Obesity class I', min: 30, max: 35, severity: 'attention' },
-  { label: 'Obesity class II', min: 35, max: 40, severity: 'critical' },
-  { label: 'Obesity class III', min: 40, severity: 'critical' },
+  { label: 'Baixo peso', max: 18.5, severity: 'attention' },
+  { label: 'Peso normal', min: 18.5, max: 25, severity: 'normal' },
+  { label: 'Sobrepeso', min: 25, max: 30, severity: 'attention' },
+  { label: 'Obesidade grau I', min: 30, max: 35, severity: 'attention' },
+  { label: 'Obesidade grau II', min: 35, max: 40, severity: 'critical' },
+  { label: 'Obesidade grau III', min: 40, severity: 'critical' },
 ]
 
 /** One WHO classification band. */
@@ -36,13 +36,16 @@ export interface BmiBand {
   severity: Severity
 }
 
+/** Highest band — unbounded above, and the fallback when nothing else matches. */
+const HIGHEST_BAND: BmiBand = { max: Infinity, label: 'Obesidade grau III', severity: 'critical' }
+
 const BANDS: readonly BmiBand[] = [
-  { max: 18.5, label: 'Underweight', severity: 'attention' },
-  { max: 25, label: 'Normal weight', severity: 'normal' },
-  { max: 30, label: 'Overweight', severity: 'attention' },
-  { max: 35, label: 'Obesity class I', severity: 'attention' },
-  { max: 40, label: 'Obesity class II', severity: 'critical' },
-  { max: Infinity, label: 'Obesity class III', severity: 'critical' },
+  { max: 18.5, label: 'Baixo peso', severity: 'attention' },
+  { max: 25, label: 'Peso normal', severity: 'normal' },
+  { max: 30, label: 'Sobrepeso', severity: 'attention' },
+  { max: 35, label: 'Obesidade grau I', severity: 'attention' },
+  { max: 40, label: 'Obesidade grau II', severity: 'critical' },
+  HIGHEST_BAND,
 ]
 
 /**
@@ -52,7 +55,7 @@ const BANDS: readonly BmiBand[] = [
  * @returns The band whose exclusive upper bound the value falls under.
  */
 export function classifyBmi(bmi: number): BmiBand {
-  return BANDS.find(b => bmi < b.max) ?? BANDS[BANDS.length - 1]
+  return BANDS.find(b => bmi < b.max) ?? HIGHEST_BAND
 }
 
 /**
@@ -80,11 +83,11 @@ export function calculateBmi(input: BmiInput): CalcResult {
   const band = classifyBmi(bmi)
 
   return {
-    label: 'Body Mass Index',
+    label: 'Índice de Massa Corporal',
     value: round(bmi, 1),
     unit: 'kg/m²',
     severity: band.severity,
-    interpretation: `BMI ${round(bmi, 1)} kg/m² — ${band.label}. WHO normal weight range is 18.5 to 24.9 kg/m².`,
+    interpretation: `IMC ${round(bmi, 1)} kg/m² — ${band.label}. A faixa de peso normal da OMS é de 18.5 a 24.9 kg/m².`,
     references: BMI_REFERENCES,
   }
 }

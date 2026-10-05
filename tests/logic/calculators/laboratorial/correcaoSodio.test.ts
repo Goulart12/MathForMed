@@ -5,30 +5,30 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateCorrectedSodium', () => {
   it('returns normal sodium when glucose is at the reference of 100 mg/dL', () => {
     const result = calculateCorrectedSodium({ measuredSodiumMeqL: 140, glucoseMgDl: 100 })
-    expect(result.label).toBe('Corrected Sodium')
+    expect(result.label).toBe('Sódio corrigido')
     expect(result.value).toBe(140)
     expect(result.unit).toBe('mEq/L')
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('Normal sodium')
+    expect(result.interpretation).toContain('Sódio normal')
   })
 
   it('corrects 129 mEq/L at 300 mg/dL up to 132.2 mEq/L', () => {
     const result = calculateCorrectedSodium({ measuredSodiumMeqL: 129, glucoseMgDl: 300 })
     expect(result.value).toBeCloseTo(132.2, 1)
     expect(result.severity).toBe('attention')
-    expect(result.interpretation).toContain('Hyponatraemia')
+    expect(result.interpretation).toContain('Hiponatremia')
   })
 
   it('returns critical severity for hypernatraemia', () => {
     const result = calculateCorrectedSodium({ measuredSodiumMeqL: 150, glucoseMgDl: 100 })
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('Hypernatraemia')
+    expect(result.interpretation).toContain('Hipernatremia')
   })
 
   it('reports the measured sodium and correction as sub-results', () => {
     const result = calculateCorrectedSodium({ measuredSodiumMeqL: 129, glucoseMgDl: 300 })
-    expect(result.subResults?.find(sub => sub.label === 'Measured Sodium')?.value).toBe(129)
-    expect(result.subResults?.find(sub => sub.label === 'Correction Applied')?.value).toBeCloseTo(
+    expect(result.subResults?.find(sub => sub.label === 'Sódio medido')?.value).toBe(129)
+    expect(result.subResults?.find(sub => sub.label === 'Correção aplicada')?.value).toBeCloseTo(
       3.2,
       1,
     )

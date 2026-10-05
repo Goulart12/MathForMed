@@ -46,20 +46,20 @@ describe('CALCULATORS_META', () => {
   it('gives every entry a fully populated metadata object', () => {
     for (const id of CALCULATOR_IDS) {
       const meta = CALCULATORS_META[id]
-      expect(meta.id, `${id}.id`).toBe(id)
-      expect(meta.name.length, `${id}.name`).toBeGreaterThan(3)
-      expect(meta.shortName.length, `${id}.shortName`).toBeGreaterThan(0)
-      expect(meta.description.length, `${id}.description`).toBeGreaterThan(10)
-      expect(CALC_CATEGORIES, `${id}.category`).toContain(meta.category)
-      expect(meta.tags.length, `${id}.tags`).toBeGreaterThan(0)
-      expect(['A', 'B', 'C'], `${id}.evidenceLevel`).toContain(meta.evidenceLevel)
-      expect(meta.reference, `${id}.reference`).toBeTruthy()
+      expect(meta?.id, `${id}.id`).toBe(id)
+      expect(meta?.name.length, `${id}.name`).toBeGreaterThan(3)
+      expect(meta?.shortName.length, `${id}.shortName`).toBeGreaterThan(0)
+      expect(meta?.description.length, `${id}.description`).toBeGreaterThan(10)
+      expect(CALC_CATEGORIES, `${id}.category`).toContain(meta?.category)
+      expect(meta?.tags.length, `${id}.tags`).toBeGreaterThan(0)
+      expect(['A', 'B', 'C'], `${id}.evidenceLevel`).toContain(meta?.evidenceLevel)
+      expect(meta?.reference, `${id}.reference`).toBeTruthy()
     }
   })
 
   it('assigns every calculator a known category', () => {
     for (const id of CALCULATOR_IDS) {
-      expect(CALC_CATEGORIES).toContain(CALCULATORS_META[id].category)
+      expect(CALC_CATEGORIES).toContain(CALCULATORS_META[id]?.category)
     }
   })
 })
@@ -113,7 +113,7 @@ describe('CALCULATORS registry', () => {
   it('agrees with the metadata on every category', () => {
     for (const id of CALCULATOR_IDS) {
       expect(CALCULATORS[id as keyof typeof CALCULATORS].category, id).toBe(
-        CALCULATORS_META[id].category,
+        CALCULATORS_META[id]?.category,
       )
     }
   })

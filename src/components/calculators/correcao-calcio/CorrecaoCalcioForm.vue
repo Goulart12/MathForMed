@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { CorrecaoCalcioInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: CorrecaoCalcioInput] }>()
+import type { CorrectedCalciumInput } from '@/logic/calculators/laboratorial/correcaoCalcio'
+const emit = defineEmits<{ calculate: [input: CorrectedCalciumInput] }>()
 
 const measuredCalciumMgDl = ref<number | null>(null)
 const albuminGDl = ref<number | null>(null)

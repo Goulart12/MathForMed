@@ -6,6 +6,7 @@
 
 import type { CalcResult, ReferenceRange, Severity } from '../../types'
 import { assertOneOf, assertRange } from '../../utils/validators'
+import { pluralize } from '../../utils/units'
 
 /** Inputs for {@link calculateChadsVasc}. */
 export interface ChadsVascInput {
@@ -28,12 +29,12 @@ export interface ChadsVascInput {
 const SEXES: readonly ('M' | 'F')[] = ['M', 'F']
 
 export const CHADS_VASC_REFERENCES: ReferenceRange[] = [
-  { label: 'Male, score 0 — low risk', max: 0, severity: 'normal' },
-  { label: 'Male, score 1 — moderate risk', min: 1, max: 1, severity: 'attention' },
-  { label: 'Male, score ≥ 2 — high risk', min: 2, severity: 'critical' },
-  { label: 'Female, score ≤ 1 — low risk', max: 1, severity: 'normal' },
-  { label: 'Female, score 2 — moderate risk', min: 2, max: 2, severity: 'attention' },
-  { label: 'Female, score ≥ 3 — high risk', min: 3, severity: 'critical' },
+  { label: 'Masc, escore 0 — baixo risco', max: 0, severity: 'normal' },
+  { label: 'Masc, escore 1 — risco moderado', min: 1, max: 1, severity: 'attention' },
+  { label: 'Masc, escore ≥ 2 — alto risco', min: 2, severity: 'critical' },
+  { label: 'Fem, escore ≤ 1 — baixo risco', max: 1, severity: 'normal' },
+  { label: 'Fem, escore 2 — risco moderado', min: 2, max: 2, severity: 'attention' },
+  { label: 'Fem, escore ≥ 3 — alto risco', min: 3, severity: 'critical' },
 ]
 
 /** One point-contributing item, exposed so the form layer can build its rows. */
@@ -70,21 +71,21 @@ export function calculateChadsVasc(input: ChadsVascInput): CalcResult {
   const { age, chf, hypertension, stroke, vascularDisease, diabetes, sex } = input
 
   assertOneOf(sex, SEXES, 'sex')
-  assertRange(age, 18, 120, 'age', 'years')
+  assertRange(age, 18, 120, 'age', 'anos')
 
   const components: ChadsVascComponent[] = [
-    { label: 'Congestive heart failure', points: chf ? 1 : 0, present: chf },
-    { label: 'Hypertension', points: hypertension ? 1 : 0, present: hypertension },
-    { label: 'Age ≥ 75', points: age >= 75 ? 2 : 0, present: age >= 75 },
-    { label: 'Age 65–74', points: age >= 65 && age < 75 ? 1 : 0, present: age >= 65 && age < 75 },
+    { label: 'Insuficiência cardíaca congestiva', points: chf ? 1 : 0, present: chf },
+    { label: 'Hipertensão', points: hypertension ? 1 : 0, present: hypertension },
+    { label: 'Idade ≥ 75', points: age >= 75 ? 2 : 0, present: age >= 75 },
+    { label: 'Idade 65–74', points: age >= 65 && age < 75 ? 1 : 0, present: age >= 65 && age < 75 },
     { label: 'Diabetes mellitus', points: diabetes ? 1 : 0, present: diabetes },
     {
-      label: 'Stroke / TIA / thromboembolism',
+      label: 'AVC / AIT / tromboembolismo',
       points: stroke ? 2 : 0,
       present: stroke,
     },
-    { label: 'Vascular disease', points: vascularDisease ? 1 : 0, present: vascularDisease },
-    { label: 'Female sex', points: sex === 'F' ? 1 : 0, present: sex === 'F' },
+    { label: 'Doença vascular', points: vascularDisease ? 1 : 0, present: vascularDisease },
+    { label: 'Sexo feminino', points: sex === 'F' ? 1 : 0, present: sex === 'F' },
   ]
 
   const score = components.reduce((total, component) => total + component.points, 0)
@@ -92,25 +93,25 @@ export function calculateChadsVasc(input: ChadsVascInput): CalcResult {
 
   const sexOnlyNote =
     sex === 'F' && score === 1
-      ? ' Female sex alone scores 1 point, equivalent to 0 in a male, and does not warrant anticoagulation on its own.'
+      ? ' O sexo feminino isoladamente pontua 1 ponto, equivalente a 0 no sexo masculino, e não justifica anticoagulação isoladamente.'
       : ''
 
   return {
-    label: 'CHA₂DS₂-VASc Score',
+    label: 'Escore CHA₂DS₂-VASc',
     value: score,
-    unit: 'points',
+    unit: pluralize(score, 'ponto'),
     severity,
-    interpretation: `CHA₂DS₂-VASc ${score} in a ${sex === 'F' ? 'female' : 'male'} — ${band} risk. ${action}${sexOnlyNote}`,
+    interpretation: `CHA₂DS₂-VASc ${score} no sexo ${sex === 'F' ? 'feminino' : 'masculino'} — risco ${band}. ${action}${sexOnlyNote}`,
     references: CHADS_VASC_REFERENCES,
     subResults: components
       .filter(component => component.points > 0)
       .map(component => ({
         label: component.label,
         value: component.points,
-        unit: 'points',
+        unit: pluralize(component.points, 'ponto'),
         severity: 'info' as const,
         // Only present criteria reach this list, so the descriptor is constant.
-        interpretation: 'Present',
+        interpretation: 'Presente',
       })),
   }
 }
@@ -122,42 +123,42 @@ function riskBand(
   if (sex === 'M') {
     if (score === 0) {
       return {
-        band: 'low',
+        band: 'baixo',
         severity: 'normal',
-        action: 'No anticoagulation recommended.',
+        action: 'Não se recomenda anticoagulação.',
       }
     }
     if (score === 1) {
       return {
-        band: 'moderate',
+        band: 'moderado',
         severity: 'attention',
-        action: 'Consider anticoagulation; annual reassessment is advised.',
+        action: 'Considerar anticoagulação; recomenda-se reavaliação anual.',
       }
     }
     return {
-      band: 'high',
+      band: 'alto',
       severity: 'critical',
-      action: 'Anticoagulation recommended.',
+      action: 'Anticoagulação recomendada.',
     }
   }
 
   if (score <= 1) {
     return {
-      band: 'low',
+      band: 'baixo',
       severity: 'normal',
-      action: 'No anticoagulation recommended.',
+      action: 'Não se recomenda anticoagulação.',
     }
   }
   if (score === 2) {
     return {
-      band: 'moderate',
+      band: 'moderado',
       severity: 'attention',
-      action: 'Consider anticoagulation; annual reassessment is advised.',
+      action: 'Considerar anticoagulação; recomenda-se reavaliação anual.',
     }
   }
   return {
-    band: 'high',
+    band: 'alto',
     severity: 'critical',
-    action: 'Anticoagulation recommended.',
+    action: 'Anticoagulação recomendada.',
   }
 }

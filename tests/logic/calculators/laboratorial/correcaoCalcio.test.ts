@@ -5,29 +5,29 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateCorrectedCalcium', () => {
   it('returns 9.6 mg/dL for 8 mg/dL at an albumin of 2 g/dL', () => {
     const result = calculateCorrectedCalcium({ measuredCalciumMgDl: 8, albuminGDl: 2 })
-    expect(result.label).toBe('Corrected Calcium')
+    expect(result.label).toBe('Cálcio corrigido')
     expect(result.value).toBeCloseTo(9.6, 1)
     expect(result.unit).toBe('mg/dL')
     expect(result.severity).toBe('normal')
-    expect(result.interpretation).toContain('normal calcium')
+    expect(result.interpretation).toContain('cálcio normal')
   })
 
   it('applies no correction at the 4 g/dL albumin anchor', () => {
     const result = calculateCorrectedCalcium({ measuredCalciumMgDl: 9, albuminGDl: 4 })
     expect(result.value).toBe(9)
-    expect(result.subResults?.find(sub => sub.label === 'Correction Applied')?.value).toBe(0)
+    expect(result.subResults?.find(sub => sub.label === 'Correção aplicada')?.value).toBe(0)
   })
 
   it('returns critical severity for critical hypocalcaemia', () => {
     const result = calculateCorrectedCalcium({ measuredCalciumMgDl: 6, albuminGDl: 4 })
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('critical hypocalcaemia')
+    expect(result.interpretation).toContain('hipocalcemia crítica')
   })
 
   it('returns critical severity for critical hypercalcaemia', () => {
     const result = calculateCorrectedCalcium({ measuredCalciumMgDl: 13, albuminGDl: 4 })
     expect(result.severity).toBe('critical')
-    expect(result.interpretation).toContain('critical hypercalcaemia')
+    expect(result.interpretation).toContain('hipercalcemia crítica')
   })
 
   it('returns attention severity for mild derangement', () => {
@@ -50,8 +50,8 @@ describe('calculateCorrectedCalcium', () => {
 
   it('reports the measured value and correction as sub-results', () => {
     const result = calculateCorrectedCalcium({ measuredCalciumMgDl: 8, albuminGDl: 2 })
-    expect(result.subResults?.find(sub => sub.label === 'Measured Calcium')?.value).toBe(8)
-    expect(result.subResults?.find(sub => sub.label === 'Correction Applied')?.value).toBeCloseTo(
+    expect(result.subResults?.find(sub => sub.label === 'Cálcio medido')?.value).toBe(8)
+    expect(result.subResults?.find(sub => sub.label === 'Correção aplicada')?.value).toBeCloseTo(
       1.6,
       1,
     )

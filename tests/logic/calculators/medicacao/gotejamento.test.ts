@@ -8,7 +8,7 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateDripRate', () => {
   it('returns 42 gtt/min for 500 mL over 4 h on macrodrip', () => {
     const result = calculateDripRate({ volumeMl: 500, timeMins: 240, tubingType: 'macro' })
-    expect(result.label).toBe('Drip Rate')
+    expect(result.label).toBe('Velocidade de gotejamento')
     expect(result.value).toBe(42)
     expect(result.unit).toBe('gtt/min')
     expect(result.severity).toBe('info')
@@ -17,7 +17,7 @@ describe('calculateDripRate', () => {
 
   it('returns the mL/h flow rate as a sub-result', () => {
     const result = calculateDripRate({ volumeMl: 500, timeMins: 240, tubingType: 'macro' })
-    expect(result.subResults?.find(sub => sub.label === 'Flow Rate')?.value).toBe(125)
+    expect(result.subResults?.find(sub => sub.label === 'Vazão')?.value).toBe(125)
   })
 
   it('triples the drop rate on microdrip for the same volume and time', () => {
@@ -34,7 +34,7 @@ describe('calculateDripRate', () => {
 
   it('exposes the drop factor used', () => {
     const result = calculateDripRate({ volumeMl: 500, timeMins: 240, tubingType: 'micro' })
-    expect(result.subResults?.find(sub => sub.label === 'Drop Factor')?.value).toBe(
+    expect(result.subResults?.find(sub => sub.label === 'Fator de gotejamento')?.value).toBe(
       DROP_FACTOR.micro,
     )
   })

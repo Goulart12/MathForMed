@@ -8,11 +8,11 @@ import SearchView from '@/views/SearchView.vue'
 import FavoritesView from '@/views/FavoritesView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import BottomNav from '@/components/layout/BottomNav.vue'
-import { useFavoritesStore } from '@/composables/useFavorites'
-import { useHistoryStore } from '@/composables/useHistory'
+import { useFavoritesStore } from '@/stores/favorites'
+import { useHistoryStore } from '@/stores/history'
 import { CATEGORIES } from '@/data/categories'
 import { CALCULATOR_IDS, requireMeta } from '@/data/calculator-meta'
-import type { CalcResult } from '@/types/logic'
+import type { CalcResult } from '@/logic/types'
 
 const currentPath = { value: '/' }
 const back = vi.fn()

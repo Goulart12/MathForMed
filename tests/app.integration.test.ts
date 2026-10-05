@@ -4,6 +4,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import type { Router } from 'vue-router'
 import App from '@/App.vue'
 import { createAppRouter } from '@/router'
+import { useHistoryStore } from '@/stores/history'
 
 /**
  * Boots the real application graph — real router, real Pinia, real views — and
@@ -211,7 +212,7 @@ describe('application shell', () => {
     await waitFor(() => document.title.includes('Buscar'), 'the search document title')
   })
 
-  it('survives a failed calculation without losing the form', async () => {
+  it('calculates end to end and shows the result card', async () => {
     const { wrapper, router } = await boot('/calc/imc')
     await waitFor(() => wrapper.find('button[type="submit"]').exists(), 'the IMC form to render')
 
@@ -220,10 +221,66 @@ describe('application shell', () => {
     await height!.setValue('175')
     await wrapper.find('form').trigger('submit')
 
-    // The logic layer is not merged yet, so this exercises the error path: the
-    // form must stay on screen with an explanation rather than a blank page.
-    await waitForText(wrapper, 'ainda não está disponível')
+    // 70 kg / 1.75 m → 22.9 kg/m², na faixa "Peso normal" da OMS.
+    await waitFor(() => wrapper.findComponent({ name: 'ResultCard' }).exists(), 'the result card')
+    expect(wrapper.text()).toContain('22.9')
+    expect(wrapper.text()).toContain('kg/m²')
+
+    // The form stays on screen so the clinician can vary the inputs.
     expect(wrapper.findAllComponents({ name: 'AppInput' })).toHaveLength(2)
     expect(router.currentRoute.value.path).toBe('/calc/imc')
+  })
+
+  it('renders the three Glasgow axes and scores them', async () => {
+    const { wrapper } = await boot('/calc/glasgow')
+    await waitFor(
+      () => wrapper.findAllComponents({ name: 'AppSelect' }).length === 3,
+      'the three Glasgow axes',
+    )
+    // The form defaults to the best response in each axis: E4 V5 M6.
+    const text = wrapper.text()
+    expect(text).toContain('Abertura ocular')
+    expect(text).toContain('Resposta verbal')
+    expect(text).toContain('Resposta motora')
+
+    await wrapper.find('form').trigger('submit')
+    await waitFor(() => wrapper.findComponent({ name: 'ResultCard' }).exists(), 'the result card')
+    // E4 + V5 + M6 = 15, mild TBI, reported per component.
+    expect(wrapper.text()).toContain('GCS 15 (E4 V5 M6)')
+    expect(wrapper.text()).toContain('Abertura ocular')
+    expect(wrapper.text()).toContain('Resposta verbal')
+    expect(wrapper.text()).toContain('Resposta motora')
+  })
+
+  it('records a successful calculation in the history store', async () => {
+    const history = useHistoryStore()
+    expect(history.entries).toHaveLength(0)
+
+    const { wrapper } = await boot('/calc/imc')
+    await waitFor(() => wrapper.find('button[type="submit"]').exists(), 'the IMC form to render')
+
+    const [weight, height] = wrapper.findAll('input')
+    await weight!.setValue('70')
+    await height!.setValue('175')
+    await wrapper.find('form').trigger('submit')
+
+    await waitFor(() => history.entries.length === 1, 'the history entry')
+    expect(history.entries[0]?.calculatorId).toBe('imc')
+    expect(history.entries[0]?.result.value).toBe(22.9)
+  })
+
+  it('keeps the form and shows no result for an out-of-range input', async () => {
+    const { wrapper } = await boot('/calc/imc')
+    await waitFor(() => wrapper.find('button[type="submit"]').exists(), 'the IMC form to render')
+
+    // The form mirrors the logic layer's ranges, so the CTA never enables a
+    // submission that would throw.
+    const [weight] = wrapper.findAll('input')
+    await weight!.setValue('900')
+    await flushPromises()
+
+    expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.findComponent({ name: 'ResultCard' }).exists()).toBe(false)
+    expect(wrapper.findAllComponents({ name: 'AppInput' })).toHaveLength(2)
   })
 })

@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { InfusaoContinuaInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: InfusaoContinuaInput] }>()
+import type { ContinuousInfusionInput } from '@/logic/calculators/medicacao/infusaoContinua'
+const emit = defineEmits<{ calculate: [input: ContinuousInfusionInput] }>()
 
 const doseMcgKgMin = ref<number | null>(null)
 const weightKg = ref<number | null>(null)

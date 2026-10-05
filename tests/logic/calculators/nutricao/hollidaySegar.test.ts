@@ -8,11 +8,11 @@ import { CalcValidationError } from '@/logic/types'
 describe('calculateHollidaySegar', () => {
   it('returns 48 mL/h for a 14 kg child', () => {
     const result = calculateHollidaySegar({ weightKg: 14 })
-    expect(result.label).toBe('Maintenance Fluid Rate')
+    expect(result.label).toBe('Taxa de manutenção de líquidos')
     expect(result.value).toBe(48)
     expect(result.unit).toBe('mL/h')
     expect(result.severity).toBe('info')
-    expect(result.interpretation).toContain('next 10 kg')
+    expect(result.interpretation).toContain('próximos 10 kg')
   })
 
   it('applies 4 mL/kg/h below 10 kg', () => {
@@ -31,27 +31,27 @@ describe('calculateHollidaySegar', () => {
   })
 
   it('reports the daily volume as a sub-result', () => {
-    expect(calculateHollidaySegar({ weightKg: 14 }).subResults?.[0].value).toBe(48 * 24)
+    expect(calculateHollidaySegar({ weightKg: 14 }).subResults?.[0]?.value).toBe(48 * 24)
   })
 
   it('caps the daily volume at 2500 mL and explains why', () => {
     const result = calculateHollidaySegar({ weightKg: 100 })
     const daily = result.subResults?.[0]
     expect(daily?.value).toBe(MAX_ML_PER_DAY)
-    expect(daily?.interpretation).toContain('capped')
+    expect(daily?.interpretation).toContain('limitado')
     expect(daily?.interpretation).toContain('30 kg')
   })
 
   it('does not cap below the ceiling', () => {
     // 50 kg → 90 mL/h → 2160 mL/day, below the cap.
     const result = calculateHollidaySegar({ weightKg: 50 })
-    expect(result.subResults?.[0].value).toBe(2160)
-    expect(result.subResults?.[0].interpretation).not.toContain('capped')
+    expect(result.subResults?.[0]?.value).toBe(2160)
+    expect(result.subResults?.[0]?.interpretation).not.toContain('limitado')
   })
 
   it('reminds the clinician to account for ongoing losses', () => {
     const result = calculateHollidaySegar({ weightKg: 12 })
-    expect(result.interpretation).toContain('ongoing losses')
+    expect(result.interpretation).toContain('perdas em curso')
   })
 
   it('throws CalcValidationError for out-of-range weight', () => {

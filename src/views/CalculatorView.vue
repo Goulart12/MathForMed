@@ -5,10 +5,10 @@ import AppButton from '@/components/ui/AppButton.vue'
 import ResultCard from '@/components/ui/ResultCard.vue'
 import { getEntry } from '@/components/calculators/registry'
 import { getCategory } from '@/data/categories'
-import { useFavoritesStore } from '@/composables/useFavorites'
-import { useHistoryStore } from '@/composables/useHistory'
+import { useFavoritesStore } from '@/stores/favorites'
+import { useHistoryStore } from '@/stores/history'
 import { useToast } from '@/composables/useToast'
-import { CalcValidationError, type CalcResult } from '@/types/logic'
+import { CalcValidationError, type CalcResult } from '@/logic/types'
 
 const props = defineProps<{ id: string }>()
 
@@ -54,12 +54,12 @@ watch(
   { immediate: true },
 )
 
-function handleCalculate(payload: never) {
+async function handleCalculate(payload: never) {
   const current = entry.value
   if (!current) return
 
   try {
-    const computed_ = current.calculate(payload)
+    const computed_ = await current.calculate(payload)
     validationMessage.value = null
     result.value = computed_
     resultEpoch.value++

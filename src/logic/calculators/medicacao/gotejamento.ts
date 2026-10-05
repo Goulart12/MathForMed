@@ -27,8 +27,8 @@ const TUBING_TYPES: readonly TubingType[] = ['macro', 'micro']
 export const DROP_FACTOR: Record<TubingType, 20 | 60> = { macro: 20, micro: 60 }
 
 const TUBING_LABELS: Record<TubingType, string> = {
-  macro: 'macrodrip (20 gtt/mL)',
-  micro: 'microdrip (60 gtt/mL)',
+  macro: 'macrogotejamento (20 gtt/mL)',
+  micro: 'microgotejamento (60 gtt/mL)',
 }
 
 /**
@@ -60,25 +60,25 @@ export function calculateDripRate(input: DripRateInput): CalcResult {
   const mlPerHour = round((volumeMl / timeMins) * 60, 1)
 
   return {
-    label: 'Drip Rate',
+    label: 'Velocidade de gotejamento',
     value: dropsPerMin,
     unit: 'gtt/min',
     severity: 'info',
-    interpretation: `Set the infusion at ${dropsPerMin} gtt/min using ${TUBING_LABELS[tubingType]} to deliver ${volumeMl} mL in ${round(timeMins / 60, 1)} h.`,
+    interpretation: `Ajuste a infusão em ${dropsPerMin} gtt/min usando ${TUBING_LABELS[tubingType]} para infundir ${volumeMl} mL em ${round(timeMins / 60, 1)} h.`,
     subResults: [
       {
-        label: 'Flow Rate',
+        label: 'Vazão',
         value: mlPerHour,
         unit: 'mL/h',
         severity: 'info',
-        interpretation: `${volumeMl} mL over ${timeMins} min equals ${mlPerHour} mL/h.`,
+        interpretation: `${volumeMl} mL em ${timeMins} min equivalem a ${mlPerHour} mL/h.`,
       },
       {
-        label: 'Drop Factor',
+        label: 'Fator de gotejamento',
         value: dropFactor,
         unit: 'gtt/mL',
         severity: 'info',
-        interpretation: `Tubing type: ${TUBING_LABELS[tubingType]}.`,
+        interpretation: `Tipo de equipo: ${TUBING_LABELS[tubingType]}.`,
       },
     ],
   }

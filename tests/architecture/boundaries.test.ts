@@ -2,6 +2,8 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { CALCULATOR_IDS, CALCULATORS_META } from '@/data/calculator-meta'
+import { CALCULATORS } from '@/logic/calculators'
+import { CALCULATORS_META as LOGIC_META } from '@/logic/constants'
 
 const SRC = resolve(process.cwd(), 'src')
 
@@ -16,42 +18,82 @@ const SOURCE_FILES = walk(SRC).filter((f) => /\.(ts|vue)$/.test(f))
 
 /** Directories the design layer owns. `src/logic` and `src/stores` belong to the
  *  logic agent's worktree and are absent here by design. */
-
 const UI_DIRS = ['components', 'views']
+
+/** The single seam where the UI is allowed to reach a real calculation function. */
+const WIRING_SEAM = join(SRC, 'components', 'calculators', 'registry.ts')
+
+/** Frameworks and globals the logic layer must stay free of. */
+const FORBIDDEN_IN_LOGIC = [
+  { label: 'vue', pattern: /from\s+['"]vue['"]|from\s+['"]@vue\// },
+  { label: 'pinia', pattern: /from\s+['"]pinia['"]/ },
+  { label: 'browser API', pattern: /\b(window|document|localStorage|navigator)\s*[.[]/ },
+]
+
+/**
+ * Module specifiers that `file` imports **as values**.
+ *
+ * `import type` is erased at build time, so it cannot ship clinical code and is
+ * not reported. The `import` keyword must start a line, otherwise the match can
+ * begin on an unrelated statement and run on to a later import — which is how a
+ * naive single regex ends up flagging a file for a type-only import.
+ */
+function valueImports(file: string): string[] {
+  const source = readFileSync(file, 'utf8')
+  const statement = /^[ \t]*import\s+([\s\S]*?)\s+from\s+['"]([^'"]+)['"]/gm
+  const specifiers: string[] = []
+  for (const match of source.matchAll(statement)) {
+    const clause = (match[1] ?? '').trim()
+    if (clause.startsWith('type ')) continue
+    specifiers.push(match[2] ?? '')
+  }
+  return specifiers
+}
 
 describe('architecture boundaries', () => {
   it('finds source files to check', () => {
     expect(SOURCE_FILES.length).toBeGreaterThan(40)
   })
 
-  it('leaves the logic layer to the logic worktree', () => {
-    // `src/logic` and `src/stores` are owned by feat/calc-logic. They must not
-    // appear here, or the merge will conflict on files nobody reviewed.
+  it('carries both layers after the merge', () => {
+    // `src/logic` and `src/stores` arrived with feat/calc-logic.
     for (const dir of ['logic', 'stores']) {
-      expect(() => statSync(join(SRC, dir)), `src/${dir} must not exist in this worktree`).toThrow()
+      expect(() => statSync(join(SRC, dir)), `src/${dir} must exist after the merge`).not.toThrow()
     }
   })
 
-  it.each(UI_DIRS)('src/%s never imports from src/logic', (dir) => {
-    const dirPath = join(SRC, dir)
-    const offenders = SOURCE_FILES.filter((f) => f.startsWith(dirPath)).filter((file) => {
+  it('keeps the logic layer free of framework and browser dependencies', () => {
+    const logicFiles = walk(join(SRC, 'logic')).filter((f) => f.endsWith('.ts'))
+    expect(logicFiles.length).toBeGreaterThan(20)
+
+    for (const file of logicFiles) {
       const source = readFileSync(file, 'utf8')
-      return /from\s+['"]@\/logic\//.test(source)
-    })
-    expect(
-      offenders.map((f) => relative(SRC, f)),
-      'UI files must consume logic types via the @/types shim until the branch merges',
-    ).toEqual([])
+      for (const { label, pattern } of FORBIDDEN_IN_LOGIC) {
+        expect(
+          pattern.test(source),
+          `${relative(SRC, file)} must not reference ${label}`,
+        ).toBe(false)
+      }
+    }
   })
 
-  it.each(UI_DIRS)('src/%s imports no calculation function from the logic layer', (dir) => {
-    const dirPath = join(SRC, dir)
-    const offenders = SOURCE_FILES.filter((f) => f.startsWith(dirPath)).filter((file) => {
-      const source = readFileSync(file, 'utf8')
-      // `import type` is erased at build time, so only value imports can ship code.
-      return /import\s+(?!type\s)[\s\S]{0,80}from\s+['"]@\/logic\//.test(source)
-    })
-    expect(offenders.map((f) => relative(SRC, f))).toEqual([])
+  it('reaches calculation functions only through the registry seam', () => {
+    // `src/logic/types` is fair game everywhere — it carries only types plus the
+    // `CalcValidationError` class the view needs for `instanceof`. Importing a
+    // formula from `src/logic/calculators` as a value is not: that must go
+    // through the one seam, so there is a single place to audit what the UI can
+    // execute. Type-only imports of the input interfaces are fine — the forms
+    // declare their `@calculate` payload with them.
+    const offenders = SOURCE_FILES.filter(
+      (f) => f.startsWith(join(SRC, 'components')) || f.startsWith(join(SRC, 'views')),
+    )
+      .filter((f) => f !== WIRING_SEAM)
+      .filter((file) => valueImports(file).some((s) => s.startsWith('@/logic/calculators/')))
+      .map((f) => relative(SRC, f))
+    expect(
+      offenders,
+      'only src/components/calculators/registry.ts may import calculation functions as values',
+    ).toEqual([])
   })
 
   it.each(UI_DIRS)('src/%s contains no formula arithmetic', (dir) => {
@@ -99,10 +141,21 @@ describe('architecture boundaries', () => {
     }
   })
 
-  it('declares every shimmed input type and calculator', () => {
-    const inputs = readFileSync(join(SRC, 'types', 'calculator-inputs.ts'), 'utf8')
-    // One exported Input interface per calculator, by contract.
-    const exported = inputs.match(/export interface \w+Input\b/g) ?? []
-    expect(exported.length).toBe(CALCULATOR_IDS.length)
+  it('declares one input type and one function per calculator in the logic layer', () => {
+    for (const id of CALCULATOR_IDS) {
+      const entry = CALCULATORS[id as keyof typeof CALCULATORS]
+      expect(entry, `${id} has no logic entry`).toBeDefined()
+      expect(typeof entry.calculate, `${id}.calculate is not a function`).toBe('function')
+    }
+    expect(Object.keys(CALCULATORS)).toHaveLength(CALCULATOR_IDS.length)
+  })
+
+  it('keeps the UI and logic metadata registries on the same ids and categories', () => {
+    // The design layer owns the pt-BR display copy and the logic layer the
+    // domain copy, so the strings differ by design — the keys must not.
+    expect(Object.keys(LOGIC_META)).toEqual([...CALCULATOR_IDS])
+    for (const id of CALCULATOR_IDS) {
+      expect(LOGIC_META[id]?.category, `${id} category`).toBe(CALCULATORS_META[id]?.category)
+    }
   })
 })

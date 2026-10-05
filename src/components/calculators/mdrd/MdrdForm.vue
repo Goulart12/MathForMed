@@ -3,8 +3,7 @@ import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppToggle from '@/components/ui/AppToggle.vue'
-import type { MdrdInput } from '@/types/calculator-inputs'
-
+import type { MdrdInput } from '@/logic/calculators/renal/tfgMdrd'
 const emit = defineEmits<{ calculate: [input: MdrdInput] }>()
 
 const age = ref<number | null>(null)

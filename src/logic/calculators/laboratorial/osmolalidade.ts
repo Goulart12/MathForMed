@@ -28,14 +28,14 @@ export const UREA_DIVISOR = 2.8
 export const OSMOL_GAP_THRESHOLD = 10
 
 export const OSMOLALITY_REFERENCES: ReferenceRange[] = [
-  { label: 'Hypotonic (< 275 mOsm/kg)', max: 275, severity: 'attention' },
+  { label: 'Hipoosmolar (< 275 mOsm/kg)', max: 275, severity: 'attention' },
   { label: 'Normal (275–295 mOsm/kg)', min: 275, max: 295, severity: 'normal' },
-  { label: 'Hypertonic (> 295 mOsm/kg)', min: 295, severity: 'attention' },
+  { label: 'Hiperosmolar (> 295 mOsm/kg)', min: 295, severity: 'attention' },
 ]
 
 export const OSMOL_GAP_REFERENCES: ReferenceRange[] = [
-  { label: 'Normal gap (< 10 mOsm/kg)', max: 9.9, severity: 'normal' },
-  { label: 'Elevated gap (≥ 10 mOsm/kg)', min: 10, severity: 'critical' },
+  { label: 'Gap normal (< 10 mOsm/kg)', max: 9.9, severity: 'normal' },
+  { label: 'Gap elevado (≥ 10 mOsm/kg)', min: 10, severity: 'critical' },
 ]
 
 /**
@@ -70,37 +70,37 @@ export function calculateOsmolality(input: OsmolalityInput): CalcResult {
   const rounded = round(calculated, 1)
 
   let severity: Severity = 'normal'
-  let interpretation = `Calculated osmolality ${rounded} mOsm/kg — within the reference range of 275 to 295 mOsm/kg.`
+  let interpretation = `Osmolalidade calculada ${rounded} mOsm/kg — dentro do intervalo de referência de 275 a 295 mOsm/kg.`
 
   if (rounded < 275) {
     severity = 'attention'
-    interpretation = `Calculated osmolality ${rounded} mOsm/kg — hypotonic (< 275 mOsm/kg), a free-water excess relative to solutes.`
+    interpretation = `Osmolalidade calculada ${rounded} mOsm/kg — hiposmolar (< 275 mOsm/kg), com excesso de água livre em relação aos solutos.`
   } else if (rounded > 295) {
     severity = 'attention'
-    interpretation = `Calculated osmolality ${rounded} mOsm/kg — hypertonic (> 295 mOsm/kg), reflecting an excess of effective solutes.`
+    interpretation = `Osmolalidade calculada ${rounded} mOsm/kg — hiperosmolar (> 295 mOsm/kg), refletindo excesso de solutos eficazes.`
   }
 
   const subResults: CalcResult[] = [
     {
-      label: 'Sodium Contribution',
+      label: 'Contribuição do sódio',
       value: round(2 * sodium, 1),
       unit: 'mOsm/kg',
       severity: 'info',
       interpretation: `2 × ${sodium} mEq/L.`,
     },
     {
-      label: 'Glucose Contribution',
+      label: 'Contribuição da glicose',
       value: round(glucoseMgDl / GLUCOSE_DIVISOR, 1),
       unit: 'mOsm/kg',
       severity: 'info',
       interpretation: `${glucoseMgDl} mg/dL ÷ ${GLUCOSE_DIVISOR}.`,
     },
     {
-      label: 'Urea Contribution',
+      label: 'Contribuição da ureia',
       value: round(bunMgDl / UREA_DIVISOR, 1),
       unit: 'mOsm/kg',
       severity: 'info',
-      interpretation: `${bunMgDl} mg/dL BUN ÷ ${UREA_DIVISOR}.`,
+      interpretation: `${bunMgDl} mg/dL de ureia ÷ ${UREA_DIVISOR}.`,
     },
   ]
 
@@ -112,22 +112,22 @@ export function calculateOsmolality(input: OsmolalityInput): CalcResult {
     if (gapCritical) severity = 'critical'
 
     subResults.push({
-      label: 'Osmolal Gap',
+      label: 'Gap Osmolal',
       value: roundedGap,
       unit: 'mOsm/kg',
       severity: gapCritical ? 'critical' : 'normal',
       interpretation: gapCritical
-        ? `Measured ${measuredOsmolality} − calculated ${rounded} = ${roundedGap} mOsm/kg. A gap of 10 mOsm/kg or more indicates unmeasured osmoles: suspect ethanol, methanol or ethylene glycol poisoning.`
-        : `Measured ${measuredOsmolality} − calculated ${rounded} = ${roundedGap} mOsm/kg, below the 10 mOsm/kg threshold.`,
+        ? `Medido ${measuredOsmolality} − calculado ${rounded} = ${roundedGap} mOsm/kg. Um gap de 10 mOsm/kg ou mais indica osmoles não medidos: suspeite de intoxicação por etanol, metanol ou etilenoglicol.`
+        : `Medido ${measuredOsmolality} − calculado ${rounded} = ${roundedGap} mOsm/kg, abaixo do limiar de 10 mOsm/kg.`,
     })
 
     if (gapCritical) {
-      interpretation = `Calculated osmolality ${rounded} mOsm/kg with an osmolal gap of ${roundedGap} mOsm/kg — suspect an unmeasured osmole such as ethanol, methanol or ethylene glycol.`
+      interpretation = `Osmolalidade calculada ${rounded} mOsm/kg com gap osmolal de ${roundedGap} mOsm/kg — suspeite de um osmole não medido, como etanol, metanol ou etilenoglicol.`
     }
   }
 
   return {
-    label: 'Serum Osmolality',
+    label: 'Osmolalidade plasmática',
     value: rounded,
     unit: 'mOsm/kg',
     severity,

@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
-import type { DiluicaoInput } from '@/types/calculator-inputs'
-
-const emit = defineEmits<{ calculate: [input: DiluicaoInput] }>()
+import type { DilutionInput } from '@/logic/calculators/medicacao/diluicao'
+const emit = defineEmits<{ calculate: [input: DilutionInput] }>()
 
 const unit = ref('mg/mL')
 const initialConcentration = ref<number | null>(null)
