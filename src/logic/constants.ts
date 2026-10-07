@@ -49,6 +49,11 @@ export const CATEGORIES: Record<
     description: 'Energy and fluid requirements',
     order: 7,
   },
+  ginecologia: {
+    label: 'Ginecologia',
+    description: 'Pregnancy dating and fetal growth',
+    order: 8,
+  },
 }
 
 /**
@@ -340,6 +345,52 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
     tags: ['holliday-segar', 'pediatria', 'hidratação', '4-2-1', 'soro'],
     evidenceLevel: 'A',
     reference: 'Holliday MA, Segar WE. Pediatrics. 1957;19(5):823–832.',
+  },
+
+  // ── GINECOLOGIA E OBSTETRÍCIA ─────────────────────────────────────────────
+  'dpp-naegele': {
+    id: 'dpp-naegele',
+    name: 'Estimated Due Date — Naegele’s Rule',
+    shortName: 'EDD',
+    description:
+      'Due date from the LMP with cycle-length adjustment, plus the Brazilian prenatal milestones.',
+    category: 'ginecologia',
+    tags: ['dpp', 'naegele', 'dum', 'parto', 'pré-natal'],
+    evidenceLevel: 'A',
+    reference: 'ACOG Committee Opinion Nº 700, 2017; FEBRASGO Manual de Gestação de Alto Risco, 2022.',
+  },
+  'idade-gestacional': {
+    id: 'idade-gestacional',
+    name: 'Gestational Age by Dates',
+    shortName: 'GA',
+    description:
+      'Gestational age from the LMP or the due date, with trimester and time remaining.',
+    category: 'ginecologia',
+    tags: ['ig', 'dum', 'dpp', 'trimestre', 'datação'],
+    evidenceLevel: 'A',
+    reference: 'ACOG Committee Opinion Nº 700. Obstet Gynecol. 2017;129:e150–4.',
+  },
+  'ig-usg': {
+    id: 'ig-usg',
+    name: 'Gestational Age by Early Ultrasound',
+    shortName: 'USG dating',
+    description:
+      'Redating from a first-trimester ultrasound, by reported age or crown-rump length, against the ACOG 2017 thresholds.',
+    category: 'ginecologia',
+    tags: ['ig', 'ultrassonografia', 'ccn', 'crl', 'reeditar', 'datação'],
+    evidenceLevel: 'A',
+    reference: 'ACOG Committee Opinion Nº 700, 2017; Hadlock FP et al. Radiology. 1982;142:497–501.',
+  },
+  'altura-uterina': {
+    id: 'altura-uterina',
+    name: 'Fundal Height — McDonald’s Rule',
+    shortName: 'Fundal height',
+    description:
+      'Fundal height against gestational age, classified by the ±2 cm window between 20 and 36 weeks.',
+    category: 'ginecologia',
+    tags: ['altura uterina', 'mcdonald', 'rciu', 'crescimento fetal', 'pré-natal'],
+    evidenceLevel: 'B',
+    reference: 'FEBRASGO 2022; Ministério da Saúde. Cadernos de Atenção Básica nº 32, 2012.',
   },
 }
 

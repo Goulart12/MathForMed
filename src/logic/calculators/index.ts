@@ -64,6 +64,15 @@ import type { HarrisBenedictInput } from './nutricao/harrisBenedict'
 import { calculateHollidaySegar } from './nutricao/hollidaySegar'
 import type { HollidaySegarInput } from './nutricao/hollidaySegar'
 
+import { calculateDppNaegele } from './ginecologia/dppNaegele'
+import type { DppNaegeleInput } from './ginecologia/dppNaegele'
+import { calculateIdadeGestacional } from './ginecologia/idadeGestacional'
+import type { IdadeGestacionalInput } from './ginecologia/idadeGestacional'
+import { calculateIgUsg } from './ginecologia/igUsg'
+import type { IgUsgInput } from './ginecologia/igUsg'
+import { calculateAlturaUterina } from './ginecologia/alturaUterina'
+import type { AlturaUterinaInput } from './ginecologia/alturaUterina'
+
 /**
  * Maps every calculator id to its calculation function.
  *
@@ -95,6 +104,10 @@ export const CALCULATORS = {
   hba1c: { calculate: calculateHba1c, input: null as unknown as Hba1cInput, category: 'laboratorial' as CalcCategory },
   'harris-benedict': { calculate: calculateHarrisBenedict, input: null as unknown as HarrisBenedictInput, category: 'nutricao' as CalcCategory },
   'holliday-segar': { calculate: calculateHollidaySegar, input: null as unknown as HollidaySegarInput, category: 'nutricao' as CalcCategory },
+  'dpp-naegele': { calculate: calculateDppNaegele, input: null as unknown as DppNaegeleInput, category: 'ginecologia' as CalcCategory },
+  'idade-gestacional': { calculate: calculateIdadeGestacional, input: null as unknown as IdadeGestacionalInput, category: 'ginecologia' as CalcCategory },
+  'ig-usg': { calculate: calculateIgUsg, input: null as unknown as IgUsgInput, category: 'ginecologia' as CalcCategory },
+  'altura-uterina': { calculate: calculateAlturaUterina, input: null as unknown as AlturaUterinaInput, category: 'ginecologia' as CalcCategory },
 } as const satisfies Record<string, unknown>
 
 /** The union of every calculator's input type. */
@@ -127,6 +140,7 @@ export function resolveCalculator(id: string): CalculatorFn | undefined {
 }
 
 export type {
+  AlturaUterinaInput,
   AnionGapInput,
   BmiInput,
   BsaInput,
@@ -137,6 +151,7 @@ export type {
   CorrectedSodiumInput,
   CreatinineClearanceInput,
   DilutionInput,
+  DppNaegeleInput,
   DoseByWeightInput,
   DripRateInput,
   FraminghamInput,
@@ -146,6 +161,8 @@ export type {
   HasBledInput,
   HollidaySegarInput,
   IdealBodyWeightInput,
+  IdadeGestacionalInput,
+  IgUsgInput,
   MdrdInput,
   OsmolalityInput,
   QsofaInput,

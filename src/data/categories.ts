@@ -1,4 +1,5 @@
 import {
+  PhBaby,
   PhBowlFood,
   PhFlask,
   PhHeart,
@@ -22,7 +23,7 @@ export interface CategoryDef {
 }
 
 /**
- * Display metadata for the seven calculator categories. Owned by the design
+ * Display metadata for the eight calculator categories. Owned by the design
  * layer (icons and copy are presentation), keyed by the `CalcCategory` union
  * that the logic layer uses for `CalculatorMeta.category`.
  */
@@ -82,6 +83,14 @@ export const CATEGORIES: CategoryDef[] = [
     icon: PhBowlFood,
     accent: 'text-cat-nutri',
     tint: 'bg-cat-nutri/12',
+  },
+  {
+    slug: 'ginecologia',
+    label: 'Ginecologia',
+    tagline: 'Datação da gestação e crescimento fetal',
+    icon: PhBaby,
+    accent: 'text-cat-go',
+    tint: 'bg-cat-go/12',
   },
 ]
 

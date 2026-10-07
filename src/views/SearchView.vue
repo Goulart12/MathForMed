@@ -5,7 +5,7 @@ import { PhMagnifyingGlass } from '@phosphor-icons/vue'
 import SearchBar from '@/components/layout/SearchBar.vue'
 import CalculatorListItem from '@/components/ui/CalculatorListItem.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
-import { searchCalculators, normalizeQuery } from '@/data/calculator-meta'
+import { CALCULATOR_IDS, searchCalculators, normalizeQuery } from '@/data/calculator-meta'
 
 const router = useRouter()
 const query = ref('')
@@ -39,7 +39,7 @@ const suggestions = ['gotejamento', 'sódio', 'glicemia', 'choque', 'pediatria',
             <PhMagnifyingGlass :size="30" class="text-ink-muted" aria-hidden="true" />
           </span>
           <p class="text-sm text-ink-secondary">
-            Busque entre as 24 calculadoras por nome, descrição ou etiqueta.
+            Busque entre as {{ CALCULATOR_IDS.length }} calculadoras por nome, descrição ou etiqueta.
           </p>
         </div>
         <SectionHeader title="Sugestões" />

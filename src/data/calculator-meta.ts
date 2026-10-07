@@ -265,6 +265,48 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
     evidenceLevel: 'B',
     reference: 'Holliday MA, Segar WE. Pediatrics. 1957;19(5):823-832.',
   },
+
+  /* --------------------------- ginecologia -------------------------------- */
+  'dpp-naegele': {
+    id: 'dpp-naegele',
+    name: 'Data Provável do Parto — Naegele',
+    shortName: 'DPP',
+    description: 'DPP pela DUM com ajuste do ciclo e marcos do pré-natal.',
+    category: 'ginecologia',
+    tags: ['dpp', 'naegele', 'dum', 'parto', 'pré-natal'],
+    evidenceLevel: 'A',
+    reference: 'ACOG Committee Opinion Nº 700, 2017; FEBRASGO 2022.',
+  },
+  'idade-gestacional': {
+    id: 'idade-gestacional',
+    name: 'Idade Gestacional',
+    shortName: 'IG',
+    description: 'Idade gestacional a partir da DUM ou da DPP, com trimestre.',
+    category: 'ginecologia',
+    tags: ['ig', 'dum', 'dpp', 'trimestre', 'datação'],
+    evidenceLevel: 'A',
+    reference: 'ACOG Committee Opinion Nº 700, 2017.',
+  },
+  'ig-usg': {
+    id: 'ig-usg',
+    name: 'Datação pela Ultrassonografia',
+    shortName: 'IG USG',
+    description: 'Reedita a IG pela USG precoce, com CCN ou IG informada.',
+    category: 'ginecologia',
+    tags: ['ig', 'ultrassonografia', 'ccn', 'crl', 'reeditar', 'datação'],
+    evidenceLevel: 'A',
+    reference: 'ACOG Nº 700, 2017; Hadlock FP et al. Radiology. 1982;142:497-501.',
+  },
+  'altura-uterina': {
+    id: 'altura-uterina',
+    name: 'Altura Uterina — McDonald',
+    shortName: 'Altura uterina',
+    description: 'Altura uterina comparada à IG pela regra de McDonald.',
+    category: 'ginecologia',
+    tags: ['altura uterina', 'mcdonald', 'rciu', 'crescimento fetal'],
+    evidenceLevel: 'B',
+    reference: 'FEBRASGO 2022; Ministério da Saúde 2012.',
+  },
 }
 
 /**
@@ -304,6 +346,11 @@ export const CALCULATOR_IDS = [
   // nutricao
   'harris-benedict',
   'holliday-segar',
+  // ginecologia
+  'dpp-naegele',
+  'idade-gestacional',
+  'ig-usg',
+  'altura-uterina',
 ] as const
 
 export type CalculatorId = (typeof CALCULATOR_IDS)[number]

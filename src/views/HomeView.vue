@@ -7,7 +7,7 @@ import CategoryCard from '@/components/ui/CategoryCard.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import SeverityBadge from '@/components/ui/SeverityBadge.vue'
 import { CATEGORIES } from '@/data/categories'
-import { CALCULATORS_META, countByCategory } from '@/data/calculator-meta'
+import { CALCULATOR_IDS, CALCULATORS_META, countByCategory } from '@/data/calculator-meta'
 import { useHistoryStore } from '@/stores/history'
 
 const history = useHistoryStore()
@@ -69,7 +69,11 @@ const recent = computed(() => history.entries.slice(0, 8))
       </section>
 
       <section class="space-y-3">
-        <SectionHeader title="Categorias" subtitle="24 calculadoras em 7 áreas." />
+        <!-- Derived, so adding a calculator cannot leave a stale count on screen. -->
+        <SectionHeader
+          title="Categorias"
+          :subtitle="`${CALCULATOR_IDS.length} calculadoras em ${CATEGORIES.length} áreas.`"
+        />
         <div class="grid grid-cols-2 gap-3">
           <CategoryCard
             v-for="category in CATEGORIES"

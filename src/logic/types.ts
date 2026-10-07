@@ -82,6 +82,7 @@ export type CalcCategory =
   | 'emergencia'
   | 'laboratorial'
   | 'nutricao'
+  | 'ginecologia'
 
 /** Union of every category id, useful for iteration and exhaustive checks. */
 export const CALC_CATEGORIES: readonly CalcCategory[] = [
@@ -92,6 +93,7 @@ export const CALC_CATEGORIES: readonly CalcCategory[] = [
   'emergencia',
   'laboratorial',
   'nutricao',
+  'ginecologia',
 ] as const
 
 /** Biological sex used by sex-specific formulas (never gender identity). */
