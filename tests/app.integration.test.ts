@@ -5,6 +5,8 @@ import type { Router } from 'vue-router'
 import App from '@/App.vue'
 import { createAppRouter } from '@/router'
 import { useHistoryStore } from '@/stores/history'
+import { CALCULATOR_IDS } from '@/data/calculator-meta'
+import { CATEGORIES } from '@/data/categories'
 
 /**
  * Boots the real application graph — real router, real Pinia, real views — and
@@ -60,11 +62,11 @@ describe('application shell', () => {
     localStorage.clear()
   })
 
-  it('renders HomeView with all seven categories at the root route', async () => {
+  it('renders HomeView with all eight categories at the root route', async () => {
     const { wrapper } = await boot('/')
     await waitFor(
-      () => wrapper.findAllComponents({ name: 'CategoryCard' }).length === 7,
-      'all seven category cards',
+      () => wrapper.findAllComponents({ name: 'CategoryCard' }).length === CATEGORIES.length,
+      'every category card',
     )
   })
 
@@ -108,10 +110,10 @@ describe('application shell', () => {
     expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBeDefined()
   })
 
-  it('loads every one of the 24 calculator forms without throwing', async () => {
+  it('loads every one of the calculator forms without throwing', async () => {
     const forms = import.meta.glob('@/components/calculators/*/*.vue')
     const slugs = Object.keys(forms).map((path) => path.split('/').at(-2)!)
-    expect(slugs).toHaveLength(24)
+    expect(slugs).toHaveLength(CALCULATOR_IDS.length)
 
     for (const slug of slugs) {
       const { wrapper, router } = await boot(`/calc/${slug}`)
@@ -188,7 +190,7 @@ describe('application shell', () => {
     const { wrapper, router } = await boot('/rota/que/nao/existe')
     await waitFor(() => router.currentRoute.value.name === 'home', 'the catch-all redirect')
     await waitFor(
-      () => wrapper.findAllComponents({ name: 'CategoryCard' }).length === 7,
+      () => wrapper.findAllComponents({ name: 'CategoryCard' }).length === CATEGORIES.length,
       'the home category grid',
     )
   })

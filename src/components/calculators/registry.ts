@@ -184,6 +184,38 @@ export const CALCULATOR_REGISTRY: Record<CalculatorId, CalculatorEntry> = {
     calculate: async input =>
       (await import('@/logic/calculators/nutricao/hollidaySegar')).calculateHollidaySegar(input),
   },
+  'dpp-naegele': {
+    meta: requireMeta('dpp-naegele'),
+    form: defineAsyncComponent(
+      () => import('@/components/calculators/dpp-naegele/DppNaegeleForm.vue'),
+    ),
+    calculate: async input =>
+      (await import('@/logic/calculators/ginecologia/dppNaegele')).calculateDppNaegele(input),
+  },
+  'idade-gestacional': {
+    meta: requireMeta('idade-gestacional'),
+    form: defineAsyncComponent(
+      () => import('@/components/calculators/idade-gestacional/IdadeGestacionalForm.vue'),
+    ),
+    calculate: async input =>
+      (await import('@/logic/calculators/ginecologia/idadeGestacional')).calculateIdadeGestacional(
+        input,
+      ),
+  },
+  'ig-usg': {
+    meta: requireMeta('ig-usg'),
+    form: defineAsyncComponent(() => import('@/components/calculators/ig-usg/IgUsgForm.vue')),
+    calculate: async input =>
+      (await import('@/logic/calculators/ginecologia/igUsg')).calculateIgUsg(input),
+  },
+  'altura-uterina': {
+    meta: requireMeta('altura-uterina'),
+    form: defineAsyncComponent(
+      () => import('@/components/calculators/altura-uterina/AlturaUterinaForm.vue'),
+    ),
+    calculate: async input =>
+      (await import('@/logic/calculators/ginecologia/alturaUterina')).calculateAlturaUterina(input),
+  },
 }
 
 export function getEntry(id: string): CalculatorEntry | undefined {

@@ -93,24 +93,24 @@ describe('HomeView', () => {
     localStorage.clear()
   })
 
-  it('renders all seven category cards', () => {
+  it('renders all eight category cards', () => {
     const wrapper = mountView(HomeView)
     for (const category of CATEGORIES) {
       expect(wrapper.text()).toContain(category.label)
     }
   })
 
-  it('passes each card its real calculator count, totalling 24', () => {
+  it('passes each card its real calculator count, totalling 28', () => {
     const wrapper = mountView(HomeView)
     const cards = wrapper.findAllComponents({ name: 'CategoryCard' })
-    expect(cards).toHaveLength(7)
+    expect(cards).toHaveLength(8)
 
     const shown = cards.map((c) => c.props('count') as number)
     const expected = CATEGORIES.map(
       (c) => CALCULATOR_IDS.filter((id) => requireMeta(id).category === c.slug).length,
     )
     expect(shown).toEqual(expected)
-    expect(shown.reduce((a, b) => a + b, 0)).toBe(24)
+    expect(shown.reduce((a, b) => a + b, 0)).toBe(28)
     expect(shown.every((n) => n > 0)).toBe(true)
   })
 
@@ -186,7 +186,7 @@ describe('SearchView', () => {
   it('starts with suggestions instead of a result list', () => {
     const wrapper = mountView(SearchView)
     expect(wrapper.text()).toContain('Sugestões')
-    expect(wrapper.text()).toContain('24 calculadoras')
+    expect(wrapper.text()).toContain('28 calculadoras')
   })
 
   it('filters as the query is typed', async () => {

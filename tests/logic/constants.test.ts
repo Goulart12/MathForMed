@@ -9,7 +9,7 @@ import {
 import { CALCULATORS, resolveCalculator } from '@/logic/calculators'
 import { CALC_CATEGORIES, CalcValidationError } from '@/logic/types'
 
-/** The 24 ids the design agent's router registers. */
+/** The 28 ids the design agent's router registers. */
 const EXPECTED_IDS = [
   'imc',
   'superficie-corporal',
@@ -35,12 +35,16 @@ const EXPECTED_IDS = [
   'hba1c',
   'harris-benedict',
   'holliday-segar',
+  'dpp-naegele',
+  'idade-gestacional',
+  'ig-usg',
+  'altura-uterina',
 ]
 
 describe('CALCULATORS_META', () => {
-  it('registers all 24 calculator ids with no extras', () => {
+  it('registers all 28 calculator ids with no extras', () => {
     expect([...CALCULATOR_IDS].sort()).toEqual([...EXPECTED_IDS].sort())
-    expect(CALCULATOR_IDS).toHaveLength(24)
+    expect(CALCULATOR_IDS).toHaveLength(28)
   })
 
   it('gives every entry a fully populated metadata object', () => {
@@ -65,10 +69,11 @@ describe('CALCULATORS_META', () => {
 })
 
 describe('CATEGORIES', () => {
-  it('labels all seven categories in registry order', () => {
+  it('labels all eight categories in registry order', () => {
     expect(Object.keys(CATEGORIES).sort()).toEqual([...CALC_CATEGORIES].sort())
     expect(CATEGORIES.medicacao.order).toBe(1)
     expect(CATEGORIES.nutricao.order).toBe(7)
+    expect(CATEGORIES.ginecologia.order).toBe(8)
   })
 
   it('gives every category a label and description', () => {
@@ -98,6 +103,7 @@ describe('calculatorsByCategory', () => {
     ])
     expect(calculatorsByCategory('laboratorial')).toHaveLength(5)
     expect(calculatorsByCategory('emergencia')).toHaveLength(4)
+    expect(calculatorsByCategory('ginecologia')).toHaveLength(4)
   })
 
   it('returns an empty list for an unused category', () => {
@@ -118,7 +124,7 @@ describe('CALCULATORS registry', () => {
     }
   })
 
-  it('covers all seven categories', () => {
+  it('covers all eight categories', () => {
     const categories = new Set(
       Object.values(CALCULATORS).map(entry => entry.category),
     )

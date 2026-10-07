@@ -17,8 +17,8 @@ import type { CalcCategory } from '@/logic/types'
 const VALID_CATEGORIES = new Set<string>(CATEGORIES.map((c) => c.slug))
 
 describe('calculator metadata integrity', () => {
-  it('has 24 calculators', () => {
-    expect(CALCULATOR_IDS).toHaveLength(24)
+  it('has 28 calculators', () => {
+    expect(CALCULATOR_IDS).toHaveLength(28)
   })
 
   it('lists no duplicate ids', () => {
@@ -52,10 +52,10 @@ describe('calculator metadata integrity', () => {
     }
   })
 
-  it('covers all seven categories', () => {
+  it('covers all eight categories', () => {
     const counts = countByCategory()
-    expect(Object.keys(counts)).toHaveLength(7)
-    expect(CATEGORIES).toHaveLength(7)
+    expect(Object.keys(counts)).toHaveLength(8)
+    expect(CATEGORIES).toHaveLength(8)
     // Every declared category must own at least one calculator.
     for (const category of CATEGORIES) {
       expect(counts[category.slug], `${category.slug} is empty`).toBeGreaterThan(0)
@@ -127,8 +127,8 @@ describe('search', () => {
   })
 
   it('returns everything for an empty query', () => {
-    expect(searchCalculators('')).toHaveLength(24)
-    expect(searchCalculators('   ')).toHaveLength(24)
+    expect(searchCalculators('')).toHaveLength(28)
+    expect(searchCalculators('   ')).toHaveLength(28)
   })
 
   it('returns nothing for a query that matches nothing', () => {
