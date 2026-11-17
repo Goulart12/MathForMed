@@ -50,7 +50,7 @@ export const CATEGORIES: Record<
     order: 7,
   },
   ginecologia: {
-    label: 'Ginecologia',
+    label: 'Ginecologia e Obstetrícia',
     description: 'Pregnancy dating and fetal growth',
     order: 8,
   },
@@ -353,7 +353,7 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
     name: 'Estimated Due Date — Naegele’s Rule',
     shortName: 'EDD',
     description:
-      'Due date from the LMP with cycle-length adjustment, plus the Brazilian prenatal milestones.',
+      'Due date from the LMP at 40 weeks, plus the Brazilian prenatal milestones.',
     category: 'ginecologia',
     tags: ['dpp', 'naegele', 'dum', 'parto', 'pré-natal'],
     evidenceLevel: 'A',
@@ -361,23 +361,12 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
   },
   'idade-gestacional': {
     id: 'idade-gestacional',
-    name: 'Gestational Age by Dates',
+    name: 'Gestational Age',
     shortName: 'GA',
     description:
-      'Gestational age from the LMP or the due date, with trimester and time remaining.',
+      'Gestational age from the LMP or by early-ultrasound dating, with the trimester.',
     category: 'ginecologia',
-    tags: ['ig', 'dum', 'dpp', 'trimestre', 'datação'],
-    evidenceLevel: 'A',
-    reference: 'ACOG Committee Opinion Nº 700. Obstet Gynecol. 2017;129:e150–4.',
-  },
-  'ig-usg': {
-    id: 'ig-usg',
-    name: 'Gestational Age by Early Ultrasound',
-    shortName: 'USG dating',
-    description:
-      'Redating from a first-trimester ultrasound, by reported age or crown-rump length, against the ACOG 2017 thresholds.',
-    category: 'ginecologia',
-    tags: ['ig', 'ultrassonografia', 'ccn', 'crl', 'reeditar', 'datação'],
+    tags: ['ig', 'dum', 'ultrassonografia', 'ccn', 'trimestre', 'datação'],
     evidenceLevel: 'A',
     reference: 'ACOG Committee Opinion Nº 700, 2017; Hadlock FP et al. Radiology. 1982;142:497–501.',
   },

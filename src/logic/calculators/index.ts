@@ -68,7 +68,6 @@ import { calculateDppNaegele } from './ginecologia/dppNaegele'
 import type { DppNaegeleInput } from './ginecologia/dppNaegele'
 import { calculateIdadeGestacional } from './ginecologia/idadeGestacional'
 import type { IdadeGestacionalInput } from './ginecologia/idadeGestacional'
-import { calculateIgUsg } from './ginecologia/igUsg'
 import type { IgUsgInput } from './ginecologia/igUsg'
 import { calculateAlturaUterina } from './ginecologia/alturaUterina'
 import type { AlturaUterinaInput } from './ginecologia/alturaUterina'
@@ -106,7 +105,6 @@ export const CALCULATORS = {
   'holliday-segar': { calculate: calculateHollidaySegar, input: null as unknown as HollidaySegarInput, category: 'nutricao' as CalcCategory },
   'dpp-naegele': { calculate: calculateDppNaegele, input: null as unknown as DppNaegeleInput, category: 'ginecologia' as CalcCategory },
   'idade-gestacional': { calculate: calculateIdadeGestacional, input: null as unknown as IdadeGestacionalInput, category: 'ginecologia' as CalcCategory },
-  'ig-usg': { calculate: calculateIgUsg, input: null as unknown as IgUsgInput, category: 'ginecologia' as CalcCategory },
   'altura-uterina': { calculate: calculateAlturaUterina, input: null as unknown as AlturaUterinaInput, category: 'ginecologia' as CalcCategory },
 } as const satisfies Record<string, unknown>
 

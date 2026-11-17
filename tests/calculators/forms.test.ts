@@ -6,7 +6,11 @@ import CockcroftForm from '@/components/calculators/cockcroft/CockcroftForm.vue'
 import DiluicaoForm from '@/components/calculators/diluicao/DiluicaoForm.vue'
 import GlasgowForm from '@/components/calculators/glasgow/GlasgowForm.vue'
 import SofaForm from '@/components/calculators/sofa/SofaForm.vue'
+import DppNaegeleForm from '@/components/calculators/dpp-naegele/DppNaegeleForm.vue'
+import IdadeGestacionalForm from '@/components/calculators/idade-gestacional/IdadeGestacionalForm.vue'
+import AppDateInput from '@/components/ui/AppDateInput.vue'
 import AppInput from '@/components/ui/AppInput.vue'
+import AppToggle from '@/components/ui/AppToggle.vue'
 
 function mountForm(component: Component): VueWrapper {
   return mount(component)
@@ -19,6 +23,13 @@ function mountForm(component: Component): VueWrapper {
 function field(wrapper: VueWrapper, label: string) {
   const component = wrapper.findAllComponents(AppInput).find((c) => c.props('label') === label)
   expect(component, `no AppInput labelled "${label}"`).toBeTruthy()
+  return component!.find('input')
+}
+
+/** Date fields go through `AppDateInput`, so they need their own lookup. */
+function dateField(wrapper: VueWrapper, label: string) {
+  const component = wrapper.findAllComponents(AppDateInput).find((c) => c.props('label') === label)
+  expect(component, `no AppDateInput labelled "${label}"`).toBeTruthy()
   return component!.find('input')
 }
 
@@ -247,5 +258,85 @@ describe('SofaForm', () => {
     for (const select of wrapper.findAll('select')) {
       expect(select.findAll('option')).toHaveLength(5)
     }
+  })
+})
+
+/** Clicks an option on the n-th `AppToggle` (0-based). */
+async function pickToggle(wrapper: VueWrapper, toggleIndex: number, optionIndex: number) {
+  const toggle = wrapper.findAllComponents(AppToggle)[toggleIndex]
+  expect(toggle, `no AppToggle at index ${toggleIndex}`).toBeTruthy()
+  await toggle!.findAll('[role="radio"]')[optionIndex]!.trigger('click')
+}
+
+describe('DppNaegeleForm', () => {
+  it('asks only for the LMP — the cycle length is fixed at 40 weeks', () => {
+    const wrapper = mountForm(DppNaegeleForm)
+    // No `AppInput` at all: the only field is the date.
+    expect(wrapper.findAllComponents(AppInput)).toHaveLength(0)
+    expect(wrapper.text()).not.toContain('Duração média do ciclo')
+    expect(wrapper.text()).toContain('40 semanas')
+  })
+
+  it('emits just the LMP, with no cycle length', async () => {
+    const wrapper = mountForm(DppNaegeleForm)
+    await dateField(wrapper, 'DUM — primeiro dia da última menstruação').setValue('2025-01-01')
+    await submit(wrapper)
+    expect(wrapper.emitted('calculate')?.at(-1)).toEqual([{ dumIso: '2025-01-01' }])
+  })
+})
+
+describe('IdadeGestacionalForm', () => {
+  const dumLabel = 'DUM — primeiro dia da última menstruação'
+
+  it('starts in the LMP mode and needs the LMP before enabling', async () => {
+    const wrapper = mountForm(IdadeGestacionalForm)
+    expect(cta(wrapper).attributes('disabled')).toBeDefined()
+
+    await dateField(wrapper, dumLabel).setValue('2025-01-01')
+    expect(cta(wrapper).attributes('disabled')).toBeUndefined()
+  })
+
+  it('emits the manual payload — and never a due date', async () => {
+    const wrapper = mountForm(IdadeGestacionalForm)
+    await dateField(wrapper, dumLabel).setValue('2025-01-01')
+    await submit(wrapper)
+    const payload = wrapper.emitted('calculate')?.at(-1)?.[0] as Record<string, unknown>
+    expect(payload).toMatchObject({ dumIso: '2025-01-01' })
+    expect(payload).not.toHaveProperty('dppIso')
+  })
+
+  it('swaps the LMP fields for the ultrasound ones', async () => {
+    const wrapper = mountForm(IdadeGestacionalForm)
+    await pickToggle(wrapper, 0, 1)
+    expect(wrapper.text()).toContain('Data da ultrassonografia')
+    expect(wrapper.text()).not.toContain(dumLabel)
+    expect(wrapper.text()).toContain('COMPARAÇÃO COM A DUM')
+  })
+
+  it('emits the ultrasound payload with the reported age', async () => {
+    const wrapper = mountForm(IdadeGestacionalForm)
+    await pickToggle(wrapper, 0, 1)
+    await dateField(wrapper, 'Data da ultrassonografia').setValue('2025-03-01')
+    await field(wrapper, 'Semanas').setValue('12')
+    await submit(wrapper)
+    expect(wrapper.emitted('calculate')?.at(-1)?.[0]).toMatchObject({
+      usgDateIso: '2025-03-01',
+      igWeeks: 12,
+    })
+  })
+
+  it('validates the crown-rump length in the CCN mode', async () => {
+    const wrapper = mountForm(IdadeGestacionalForm)
+    await pickToggle(wrapper, 0, 1)
+    await dateField(wrapper, 'Data da ultrassonografia').setValue('2025-03-01')
+    await pickToggle(wrapper, 1, 1) // the second toggle: reported age vs CCN
+
+    await field(wrapper, 'Comprimento crânio-caudal (CCN)').setValue('1')
+    expect(cta(wrapper).attributes('disabled')).toBeDefined()
+
+    await field(wrapper, 'Comprimento crânio-caudal (CCN)').setValue('48')
+    expect(cta(wrapper).attributes('disabled')).toBeUndefined()
+    await submit(wrapper)
+    expect(wrapper.emitted('calculate')?.at(-1)?.[0]).toMatchObject({ crlMm: 48 })
   })
 })

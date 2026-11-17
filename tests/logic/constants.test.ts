@@ -9,7 +9,7 @@ import {
 import { CALCULATORS, resolveCalculator } from '@/logic/calculators'
 import { CALC_CATEGORIES, CalcValidationError } from '@/logic/types'
 
-/** The 28 ids the design agent's router registers. */
+/** The 27 ids the design agent's router registers. */
 const EXPECTED_IDS = [
   'imc',
   'superficie-corporal',
@@ -37,14 +37,13 @@ const EXPECTED_IDS = [
   'holliday-segar',
   'dpp-naegele',
   'idade-gestacional',
-  'ig-usg',
   'altura-uterina',
 ]
 
 describe('CALCULATORS_META', () => {
-  it('registers all 28 calculator ids with no extras', () => {
+  it('registers all 27 calculator ids with no extras', () => {
     expect([...CALCULATOR_IDS].sort()).toEqual([...EXPECTED_IDS].sort())
-    expect(CALCULATOR_IDS).toHaveLength(28)
+    expect(CALCULATOR_IDS).toHaveLength(27)
   })
 
   it('gives every entry a fully populated metadata object', () => {
@@ -103,7 +102,7 @@ describe('calculatorsByCategory', () => {
     ])
     expect(calculatorsByCategory('laboratorial')).toHaveLength(5)
     expect(calculatorsByCategory('emergencia')).toHaveLength(4)
-    expect(calculatorsByCategory('ginecologia')).toHaveLength(4)
+    expect(calculatorsByCategory('ginecologia')).toHaveLength(3)
   })
 
   it('returns an empty list for an unused category', () => {

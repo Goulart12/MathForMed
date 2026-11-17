@@ -271,7 +271,7 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
     id: 'dpp-naegele',
     name: 'Data Provável do Parto — Naegele',
     shortName: 'DPP',
-    description: 'DPP pela DUM com ajuste do ciclo e marcos do pré-natal.',
+    description: 'DPP pela DUM (gestação de 40 semanas) e marcos do pré-natal.',
     category: 'ginecologia',
     tags: ['dpp', 'naegele', 'dum', 'parto', 'pré-natal'],
     evidenceLevel: 'A',
@@ -281,19 +281,9 @@ export const CALCULATORS_META: Record<string, CalculatorMeta> = {
     id: 'idade-gestacional',
     name: 'Idade Gestacional',
     shortName: 'IG',
-    description: 'Idade gestacional a partir da DUM ou da DPP, com trimestre.',
+    description: 'Idade gestacional pela DUM ou pela datação ultrassonográfica, com trimestre.',
     category: 'ginecologia',
-    tags: ['ig', 'dum', 'dpp', 'trimestre', 'datação'],
-    evidenceLevel: 'A',
-    reference: 'ACOG Committee Opinion Nº 700, 2017.',
-  },
-  'ig-usg': {
-    id: 'ig-usg',
-    name: 'Datação pela Ultrassonografia',
-    shortName: 'IG USG',
-    description: 'Reedita a IG pela USG precoce, com CCN ou IG informada.',
-    category: 'ginecologia',
-    tags: ['ig', 'ultrassonografia', 'ccn', 'crl', 'reeditar', 'datação'],
+    tags: ['ig', 'dum', 'ultrassonografia', 'ccn', 'trimestre', 'datação'],
     evidenceLevel: 'A',
     reference: 'ACOG Nº 700, 2017; Hadlock FP et al. Radiology. 1982;142:497-501.',
   },
@@ -349,7 +339,6 @@ export const CALCULATOR_IDS = [
   // ginecologia
   'dpp-naegele',
   'idade-gestacional',
-  'ig-usg',
   'altura-uterina',
 ] as const
 

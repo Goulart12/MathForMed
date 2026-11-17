@@ -202,12 +202,6 @@ export const CALCULATOR_REGISTRY: Record<CalculatorId, CalculatorEntry> = {
         input,
       ),
   },
-  'ig-usg': {
-    meta: requireMeta('ig-usg'),
-    form: defineAsyncComponent(() => import('@/components/calculators/ig-usg/IgUsgForm.vue')),
-    calculate: async input =>
-      (await import('@/logic/calculators/ginecologia/igUsg')).calculateIgUsg(input),
-  },
   'altura-uterina': {
     meta: requireMeta('altura-uterina'),
     form: defineAsyncComponent(
