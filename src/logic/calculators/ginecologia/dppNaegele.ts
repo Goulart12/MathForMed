@@ -6,15 +6,12 @@
  */
 
 import type { CalcResult, ReferenceRange } from '../../types'
-import { assertRange } from '../../utils/validators'
 import { addDays, diffDays, formatBR, formatGA, parseIsoDate, today } from '../../utils/dates'
 
 /** Inputs for {@link calculateDppNaegele}. */
 export interface DppNaegeleInput {
   /** First day of the last menstrual period, as `YYYY-MM-DD`. */
   dumIso: string
-  /** Mean menstrual cycle length in days. Defaults to 28 when omitted. */
-  cycleDays?: number
   /**
    * Day to measure the current gestational age against, as `YYYY-MM-DD`.
    * Defaults to today.
@@ -66,18 +63,16 @@ const MAX_LMP_AGE_DAYS = 308
 /**
  * Calculates the estimated due date by Naegele's rule.
  *
- * DPP = DUM + 280 + (ciclo − 28) days
+ * DPP = DUM + 280 days (40 weeks)
  *
- * The 280 days are counted from the LMP, so a cycle longer than 28 days moves
- * the due date later by exactly the difference. That keeps the calculation on
- * the ACOG convention of 280 days from LMP rather than the older calendar form
- * of the rule (LMP + 7 dias − 3 meses + 1 ano), which drifts from 280 by one to
- * two days depending on the month the LMP falls in.
+ * The 280 days are counted from the LMP, which is the ACOG convention and the
+ * base form of the rule, rather than the older calendar form (LMP + 7 dias −
+ * 3 meses + 1 ano), which drifts from 280 by one to two days depending on the
+ * month the LMP falls in.
  *
- * @param input - LMP date and, optionally, the cycle length in days and a
- *   reference day to measure the current age against.
+ * @param input - LMP date and, optionally, a reference day to measure the
+ *   current age against.
  * @returns The due date, today's gestational age and the prenatal milestones.
- * @throws {CalcValidationError} When the cycle length is outside 21–35 days.
  * @throws {RangeError} When the LMP is in the future or more than 44 weeks old.
  *
  * @reference Naegele FC. Lehrbuch der Geburtshilfe. 1806.
@@ -89,9 +84,6 @@ const MAX_LMP_AGE_DAYS = 308
  * calculateDppNaegele({ dumIso: '2025-03-01' }).dppFormatted // '06/12/2025'
  */
 export function calculateDppNaegele(input: DppNaegeleInput): DppNaegeleResult {
-  const cycle = input.cycleDays ?? 28
-  assertRange(cycle, 21, 35, 'cycleDays', 'dias')
-
   const dum = parseIsoDate(input.dumIso)
   const now = input.referenceDateIso ? parseIsoDate(input.referenceDateIso) : today()
 
@@ -105,7 +97,7 @@ export function calculateDppNaegele(input: DppNaegeleInput): DppNaegeleResult {
     )
   }
 
-  const dpp = addDays(dum, 280 + (cycle - 28))
+  const dpp = addDays(dum, 280)
   const igDaysAtual = ageInDays
   const igAtual = formatGA(igDaysAtual)
 

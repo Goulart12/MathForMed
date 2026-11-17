@@ -100,7 +100,7 @@ describe('HomeView', () => {
     }
   })
 
-  it('passes each card its real calculator count, totalling 28', () => {
+  it('passes each card its real calculator count, totalling 27', () => {
     const wrapper = mountView(HomeView)
     const cards = wrapper.findAllComponents({ name: 'CategoryCard' })
     expect(cards).toHaveLength(8)
@@ -110,7 +110,7 @@ describe('HomeView', () => {
       (c) => CALCULATOR_IDS.filter((id) => requireMeta(id).category === c.slug).length,
     )
     expect(shown).toEqual(expected)
-    expect(shown.reduce((a, b) => a + b, 0)).toBe(28)
+    expect(shown.reduce((a, b) => a + b, 0)).toBe(27)
     expect(shown.every((n) => n > 0)).toBe(true)
   })
 
@@ -186,7 +186,7 @@ describe('SearchView', () => {
   it('starts with suggestions instead of a result list', () => {
     const wrapper = mountView(SearchView)
     expect(wrapper.text()).toContain('Sugestões')
-    expect(wrapper.text()).toContain('28 calculadoras')
+    expect(wrapper.text()).toContain('27 calculadoras')
   })
 
   it('filters as the query is typed', async () => {

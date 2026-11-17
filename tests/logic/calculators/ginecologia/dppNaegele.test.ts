@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { calculateDppNaegele } from '@/logic/calculators/ginecologia/dppNaegele'
-import { CalcValidationError } from '@/logic/types'
 
 describe('calculateDppNaegele', () => {
   /** A reference day 30 days after the LMP, so the 44-week guard never fires. */
-const REF = '2025-04-01'
+  const REF = '2025-04-01'
 
-it('adds 280 days to the LMP for a 28-day cycle', () => {
+  it('adds 280 days to the LMP — a 40-week gestation', () => {
     // 01/03 + 280 = 06/12.
     expect(
       calculateDppNaegele({ dumIso: '2025-03-01', referenceDateIso: REF }).dppFormatted,
@@ -19,36 +18,17 @@ it('adds 280 days to the LMP for a 28-day cycle', () => {
     ).toBe('27/05/2011')
   })
 
-  it('treats the cycle as 28 days when it is omitted', () => {
+  it('ignores a legacy cycle length instead of shifting the due date', () => {
+    // `cycleDays` was removed from the payload; a caller still sending it must
+    // still get the plain DUM + 280 result, never a cycle-adjusted one.
     expect(
-      calculateDppNaegele({ dumIso: '2025-03-01', referenceDateIso: REF }).dppFormatted,
-    ).toBe(
-      calculateDppNaegele({ dumIso: '2025-03-01', cycleDays: 28, referenceDateIso: REF })
+      calculateDppNaegele({ dumIso: '2025-03-01', referenceDateIso: REF, cycleDays: 35 } as never)
         .dppFormatted,
-    )
-  })
-
-  it('shifts the due date one day per cycle day beyond 28', () => {
-    const base = { dumIso: '2025-02-05', referenceDateIso: REF }
-    // 05/02 + 280 = 12/11; each cycle day past 28 moves it a day later.
-    expect(calculateDppNaegele({ ...base, cycleDays: 28 }).dppFormatted).toBe('12/11/2025')
-    expect(calculateDppNaegele({ ...base, cycleDays: 35 }).dppFormatted).toBe('19/11/2025')
-    expect(calculateDppNaegele({ ...base, cycleDays: 21 }).dppFormatted).toBe('05/11/2025')
-  })
-
-  it('steps the due date by exactly one day per cycle day', () => {
-    const base = { dumIso: '2025-02-05', referenceDateIso: REF }
-    const shift = (from: number, to: number) => {
-      const diff = (br: string) => {
-        const [day = 0, month = 1, year = 1970] = br.split('/').map(Number)
-        return new Date(year, month - 1, day).getTime()
-      }
-      return diff(calculateDppNaegele({ ...base, cycleDays: to }).dppFormatted) -
-        diff(calculateDppNaegele({ ...base, cycleDays: from }).dppFormatted)
-    }
-    expect(shift(28, 29)).toBe(86_400_000)
-    expect(shift(28, 33)).toBe(5 * 86_400_000)
-    expect(shift(28, 22)).toBe(-6 * 86_400_000)
+    ).toBe('06/12/2025')
+    expect(
+      calculateDppNaegele({ dumIso: '2025-03-01', referenceDateIso: REF, cycleDays: 21 } as never)
+        .dppFormatted,
+    ).toBe('06/12/2025')
   })
 
   it('spans a leap day in the LMP year without shifting by a day', () => {
@@ -120,15 +100,6 @@ it('adds 280 days to the LMP for a 28-day cycle', () => {
     expect(calculateDppNaegele({ dumIso: isoDaysAgo(days) }).severity).toBe(severity)
   })
 
-  it('throws for a cycle length outside 21–35 days', () => {
-    expect(() => calculateDppNaegele({ dumIso: '2024-06-01', cycleDays: 18 })).toThrow(
-      CalcValidationError,
-    )
-    expect(() => calculateDppNaegele({ dumIso: '2024-06-01', cycleDays: 40 })).toThrow(
-      CalcValidationError,
-    )
-  })
-
   it('throws for a future LMP', () => {
     expect(() => calculateDppNaegele({ dumIso: isoDaysAgo(-10) })).toThrow(
       'A DUM não pode ser uma data futura.',
@@ -137,22 +108,6 @@ it('adds 280 days to the LMP for a 28-day cycle', () => {
 
   it('throws for an LMP older than 44 weeks', () => {
     expect(() => calculateDppNaegele({ dumIso: isoDaysAgo(309) })).toThrow(/44/)
-  })
-
-  it('names the offending field for a bad cycle length', () => {
-    try {
-      calculateDppNaegele({ dumIso: '2025-03-01', cycleDays: 18 })
-      expect.unreachable('should have thrown')
-    } catch (error) {
-      expect((error as CalcValidationError).field).toBe('cycleDays')
-    }
-  })
-
-  it('boundary: accepts the extreme permitted cycle lengths', () => {
-    // A recent LMP, so the 44-week ceiling is not what is under test here.
-    const base = { dumIso: isoDaysAgo(30) }
-    expect(() => calculateDppNaegele({ ...base, cycleDays: 21 })).not.toThrow()
-    expect(() => calculateDppNaegele({ ...base, cycleDays: 35 })).not.toThrow()
   })
 
   it('boundary: accepts an LMP of exactly 44 weeks', () => {

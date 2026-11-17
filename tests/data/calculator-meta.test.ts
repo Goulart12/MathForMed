@@ -17,8 +17,8 @@ import type { CalcCategory } from '@/logic/types'
 const VALID_CATEGORIES = new Set<string>(CATEGORIES.map((c) => c.slug))
 
 describe('calculator metadata integrity', () => {
-  it('has 28 calculators', () => {
-    expect(CALCULATOR_IDS).toHaveLength(28)
+  it('has 27 calculators', () => {
+    expect(CALCULATOR_IDS).toHaveLength(27)
   })
 
   it('lists no duplicate ids', () => {
@@ -127,8 +127,8 @@ describe('search', () => {
   })
 
   it('returns everything for an empty query', () => {
-    expect(searchCalculators('')).toHaveLength(28)
-    expect(searchCalculators('   ')).toHaveLength(28)
+    expect(searchCalculators('')).toHaveLength(27)
+    expect(searchCalculators('   ')).toHaveLength(27)
   })
 
   it('returns nothing for a query that matches nothing', () => {

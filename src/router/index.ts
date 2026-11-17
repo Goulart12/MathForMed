@@ -43,6 +43,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { title: 'Categoria' },
   },
   {
+    // The ultrasound dating calculator was folded into `idade-gestacional`.
+    // Keep old links, history entries and favourites working.
+    path: '/calc/ig-usg',
+    redirect: { name: 'calculator', params: { id: 'idade-gestacional' } },
+  },
+  {
     path: '/calc/:id',
     name: 'calculator',
     component: () => import('@/views/CalculatorView.vue'),

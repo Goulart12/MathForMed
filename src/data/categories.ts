@@ -86,7 +86,7 @@ export const CATEGORIES: CategoryDef[] = [
   },
   {
     slug: 'ginecologia',
-    label: 'Ginecologia',
+    label: 'Ginecologia e Obstetrícia',
     tagline: 'Datação da gestação e crescimento fetal',
     icon: PhBaby,
     accent: 'text-cat-go',

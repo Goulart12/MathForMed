@@ -1,21 +1,29 @@
 /**
- * Manual gestational age, derived from either the LMP or the due date.
+ * Gestational age, derived from the LMP or from an early ultrasound.
+ *
+ * The ultrasound branch delegates to {@link calculateIgUsg}, so a single entry
+ * point covers both dating modes the calculator exposes.
  *
  * @module logic/calculators/ginecologia/idadeGestacional
  */
 
 import type { CalcResult, ReferenceRange } from '../../types'
-import { addDays, decomposeGA, diffDays, formatBR, parseIsoDate, today } from '../../utils/dates'
+import { decomposeGA, diffDays, parseIsoDate, today } from '../../utils/dates'
+import { calculateIgUsg, type IgUsgInput } from './igUsg'
 
-/** Inputs for {@link calculateIdadeGestacional}. Provide `dumIso` or `dppIso`. */
-export interface IdadeGestacionalInput {
+/** Manual dating inputs: the LMP, plus the day to measure the age at. */
+export interface IdadeGestacionalDatesInput {
   /** First day of the last menstrual period, as `YYYY-MM-DD`. */
   dumIso?: string
-  /** Estimated due date, as `YYYY-MM-DD`. Used when no LMP is given. */
-  dppIso?: string
   /** Day to measure the age at, as `YYYY-MM-DD`. Defaults to today. */
   referenceDateIso?: string
 }
+
+/**
+ * Inputs for {@link calculateIdadeGestacional}: manual dating from the LMP, or
+ * ultrasound dating (see {@link IgUsgInput}).
+ */
+export type IdadeGestacionalInput = IdadeGestacionalDatesInput | IgUsgInput
 
 /** Gestational-age bands, counted in days from the LMP. */
 export const IDADE_GESTACIONAL_REFERENCES: ReferenceRange[] = [
@@ -29,16 +37,18 @@ export const IDADE_GESTACIONAL_REFERENCES: ReferenceRange[] = [
 const FIRST_TRIMESTER_END = 97
 /** End of the second trimester: 27s6d. */
 const SECOND_TRIMESTER_END = 195
+/** Term, counted from the LMP: 40s0d. */
+const TERM_DAYS = 280
 
 /**
- * Calculates gestational age from the LMP or from the due date.
+ * Calculates gestational age from the LMP, or redates it from an early
+ * ultrasound when the payload carries a scan date.
  *
- * When the due date is supplied instead of the LMP the LMP is back-calculated
- * as DPP − 280 days, which is the ACOG convention.
- *
- * @param input - LMP **or** due date, plus an optional reference day.
- * @returns The age in weeks and days, with the trimester and time remaining.
- * @throws {RangeError} When neither date is given, or the reference day precedes
+ * @param input - Either the LMP plus an optional reference day, or the
+ *   ultrasound payload accepted by {@link calculateIgUsg}.
+ * @returns The age in weeks and days, with the trimester and, for the manual
+ *   mode, the time remaining to term (40s0d).
+ * @throws {RangeError} When the LMP is missing, or the reference day precedes
  *   the LMP.
  *
  * @reference ACOG Committee Opinion Nº 700. Obstet Gynecol. 2017;129:e150–4.
@@ -49,21 +59,15 @@ const SECOND_TRIMESTER_END = 195
  * // '14s 0d'
  */
 export function calculateIdadeGestacional(input: IdadeGestacionalInput): CalcResult {
-  if (!input.dumIso && !input.dppIso) {
-    throw new RangeError('Informe a DUM ou a DPP para calcular a idade gestacional.')
+  // The scan payload is the discriminator: only the ultrasound shape has it.
+  if ('usgDateIso' in input) return calculateIgUsg(input)
+
+  if (!input.dumIso) {
+    throw new RangeError('Informe a DUM para calcular a idade gestacional.')
   }
 
   const refDate = input.referenceDateIso ? parseIsoDate(input.referenceDateIso) : today()
-
-  let dum: Date
-  let dpp: Date
-  if (input.dumIso) {
-    dum = parseIsoDate(input.dumIso)
-    dpp = addDays(dum, 280)
-  } else {
-    dpp = parseIsoDate(input.dppIso as string)
-    dum = addDays(dpp, -280)
-  }
+  const dum = parseIsoDate(input.dumIso)
 
   const igDays = diffDays(refDate, dum)
   if (igDays < 0) {
@@ -71,7 +75,7 @@ export function calculateIdadeGestacional(input: IdadeGestacionalInput): CalcRes
   }
 
   const { weeks, days } = decomposeGA(igDays)
-  const daysUntilDpp = diffDays(dpp, refDate)
+  const daysUntilTerm = TERM_DAYS - igDays
 
   const trimester =
     igDays <= FIRST_TRIMESTER_END
@@ -88,16 +92,16 @@ export function calculateIdadeGestacional(input: IdadeGestacionalInput): CalcRes
     interpretation = 'Gestação muito inicial. Confirme com β-hCG e ultrassonografia transvaginal.'
   } else if (weeks < 37) {
     severity = 'normal'
-    interpretation = `${trimester} de baixo risco. Faltam ${Math.floor(daysUntilDpp / 7)} semanas para a DPP (${formatBR(dpp)}).`
+    interpretation = `${trimester} de baixo risco. Faltam ${Math.floor(daysUntilTerm / 7)} semanas e ${daysUntilTerm % 7} dias para 40s0d.`
   } else if (weeks < 40) {
     severity = 'normal'
-    interpretation = `Gestação a termo. DPP em ${formatBR(dpp)}.`
+    interpretation = 'Gestação a termo.'
   } else if (weeks < 42) {
     severity = 'attention'
-    interpretation = `Pós-DPP. Avalie a necessidade de indução. A DPP era ${formatBR(dpp)}.`
+    interpretation = `Gestação com ${weeks} semanas completas. Avalie o bem-estar fetal e a necessidade de indução.`
   } else {
     severity = 'critical'
-    interpretation = `Pós-datismo (${weeks} semanas). Avaliação obstétrica imediata; a DPP era ${formatBR(dpp)}.`
+    interpretation = `Pós-datismo (${weeks} semanas). Avaliação obstétrica imediata.`
   }
 
   return {
@@ -105,27 +109,7 @@ export function calculateIdadeGestacional(input: IdadeGestacionalInput): CalcRes
     label: 'Idade Gestacional',
     severity,
     interpretation,
-    subResults: [
-      { label: 'Trimestre', value: trimester, severity: 'info', interpretation: '' },
-      {
-        label: 'DPP estimada',
-        value: formatBR(dpp),
-        severity: 'info',
-        interpretation: 'Calculada como DUM + 280 dias.',
-      },
-      {
-        label: 'Tempo até a DPP',
-        value:
-          daysUntilDpp > 0
-            ? `${Math.floor(daysUntilDpp / 7)}s ${daysUntilDpp % 7}d`
-            : 'Pós-DPP',
-        severity: daysUntilDpp > 0 ? 'info' : 'attention',
-        interpretation:
-          daysUntilDpp > 0
-            ? ''
-            : `A DPP passou há ${Math.abs(daysUntilDpp)} dias, pela datação menstrual.`,
-      },
-    ],
+    subResults: [{ label: 'Trimestre', value: trimester, severity: 'info', interpretation: '' }],
     references: IDADE_GESTACIONAL_REFERENCES,
   }
 }
