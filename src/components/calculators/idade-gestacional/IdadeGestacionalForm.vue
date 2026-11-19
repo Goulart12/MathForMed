@@ -16,10 +16,8 @@ const dumIso = ref('')
 const referenceDateIso = ref(formatIso(today()))
 
 const usgDateIso = ref('')
-const igMode = ref<'ig' | 'ccn'>('ig')
 const igWeeks = ref<number | null>(null)
 const igDays = ref<number | null>(0)
-const crlMm = ref<number | null>(null)
 const comparisonDumIso = ref('')
 
 const todayIso = formatIso(today())
@@ -28,26 +26,18 @@ const isValid = computed(() => {
   if (mode.value === 'dum') return dumIso.value !== '' && referenceDateIso.value !== ''
 
   if (!usgDateIso.value) return false
-  if (igMode.value === 'ig') {
-    const weeks = igWeeks.value
-    return weeks !== null && weeks >= 0 && weeks <= 41
-  }
-  const crl = crlMm.value
-  return crl !== null && crl >= 2 && crl <= 90
+  const weeks = igWeeks.value
+  return weeks !== null && weeks >= 0 && weeks <= 41
 })
 
 function handleSubmit() {
   if (!isValid.value) return
 
   if (mode.value === 'usg') {
-    const crl = crlMm.value
-    const weeks = igWeeks.value
-    const days = igDays.value
     emit('calculate', {
       usgDateIso: usgDateIso.value,
-      igWeeks: igMode.value === 'ig' && weeks !== null ? weeks : undefined,
-      igDays: igMode.value === 'ig' && days !== null ? days : undefined,
-      crlMm: igMode.value === 'ccn' && crl !== null ? crl : undefined,
+      igWeeks: igWeeks.value ?? undefined,
+      igDays: igDays.value ?? undefined,
       dumIso: comparisonDumIso.value || undefined,
     })
     return
@@ -61,7 +51,14 @@ function handleSubmit() {
   <form class="space-y-4" novalidate @submit.prevent="handleSubmit">
     <SectionHeader title="DATAÇÃO" />
 
-    <AppToggle v-model="mode" label="Datação por" :options="['dum', 'usg']" />
+    <AppToggle
+      v-model="mode"
+      label="Datação por"
+      :options="[
+        { value: 'dum', label: 'DUM' },
+        { value: 'usg', label: 'USG' },
+      ]"
+    />
 
     <template v-if="mode === 'dum'">
       <AppDateInput
@@ -86,13 +83,7 @@ function handleSubmit() {
         required
       />
 
-      <AppToggle
-        v-model="igMode"
-        label="Informar a idade gestacional como"
-        :options="['ig', 'ccn']"
-      />
-
-      <div v-if="igMode === 'ig'" class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-2 gap-3">
         <AppInput
           v-model="igWeeks"
           label="Semanas"
@@ -115,19 +106,6 @@ function handleSubmit() {
         />
       </div>
 
-      <AppInput
-        v-else
-        v-model="crlMm"
-        label="Comprimento crânio-caudal (CCN)"
-        unit="mm"
-        type="number"
-        :min="2"
-        :max="90"
-        step="0.1"
-        placeholder="48"
-        hint="Válido de 2 a 90 mm, no 1º trimestre. A idade é calculada pela equação de Hadlock (1982)."
-      />
-
       <SectionHeader
         title="COMPARAÇÃO COM A DUM"
         subtitle="Opcional. Preencha para a ferramenta avaliar se a gestação deve ser reeditada."
@@ -144,7 +122,7 @@ function handleSubmit() {
       {{
         mode === 'dum'
           ? 'Informe a DUM.'
-          : `Informe a data da USG e ${igMode === 'ig' ? 'a idade gestacional' : 'o CCN'}.`
+          : 'Informe a data da USG e a idade gestacional.'
       }}
     </p>
 

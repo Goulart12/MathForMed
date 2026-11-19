@@ -47,7 +47,10 @@ function handleSubmit() {
     <AppToggle
       v-model="formula"
       label="Fórmula"
-      :options="['mosteller', 'dubois']"
+      :options="[
+        { value: 'mosteller', label: 'Mosteller' },
+        { value: 'dubois', label: 'Du Bois' },
+      ]"
     />
 
     <p v-if="!isValid" class="text-center text-sm text-ink-faint">

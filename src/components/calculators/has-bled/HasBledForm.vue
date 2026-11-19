@@ -91,7 +91,7 @@ function handleSubmit() {
       <ScoreRow
         v-model="alcoholUse"
         label="Uso de álcool"
-        description="8 ou mais Drinks por semana"
+        description="8 ou mais doses de álcool por semana"
         :points="1"
       />
     </div>

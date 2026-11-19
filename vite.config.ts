@@ -20,7 +20,7 @@ export default defineConfig({
       manifest: {
         name: 'MathForMed',
         short_name: 'MathForMed',
-        description: 'Medical calculators for clinical use',
+        description: 'Calculadoras médicas para uso clínico',
         lang: 'pt-BR',
         dir: 'ltr',
         categories: ['medical', 'health', 'utilities'],
