@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+/** A segment is either a bare value (shown as-is) or a value with display text. */
+type ToggleOption = string | { value: string; label: string }
+
 const props = defineProps<{
   label: string
   modelValue: string
   /** Exactly two options — a segmented control is not a multi-select. */
-  options: [string, string]
+  options: [ToggleOption, ToggleOption]
   disabled?: boolean
 }>()
 
@@ -13,11 +16,23 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const activeIndex = computed(() => (props.modelValue === props.options[1] ? 1 : 0))
+/** The bound value behind a segment, whether it is a string or an object. */
+function optionValue(option: ToggleOption): string {
+  return typeof option === 'string' ? option : option.value
+}
 
-function pick(option: string, index: number) {
+/** The text painted on the segment. */
+function optionLabel(option: ToggleOption): string {
+  return typeof option === 'string' ? option : option.label
+}
+
+const activeIndex = computed(
+  () => (optionValue(props.options[1]) === props.modelValue ? 1 : 0),
+)
+
+function pick(option: ToggleOption, index: number) {
   if (props.disabled || activeIndex.value === index) return
-  emit('update:modelValue', option)
+  emit('update:modelValue', optionValue(option))
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -26,7 +41,7 @@ function onKeydown(event: KeyboardEvent) {
   const next = event.key === 'ArrowRight' ? 1 : 0
   const option = props.options[next]
   if (option) {
-    emit('update:modelValue', option)
+    emit('update:modelValue', optionValue(option))
     // Keep focus on the newly active segment for continued arrow-key travel.
     const group = (event.currentTarget as HTMLElement).parentElement
     group?.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus()
@@ -46,7 +61,7 @@ function onKeydown(event: KeyboardEvent) {
     >
       <button
         v-for="(option, index) in options"
-        :key="option"
+        :key="optionValue(option)"
         type="button"
         role="radio"
         :aria-checked="activeIndex === index"
@@ -62,7 +77,7 @@ function onKeydown(event: KeyboardEvent) {
         @click="pick(option, index)"
         @keydown="onKeydown"
       >
-        {{ option }}
+        {{ optionLabel(option) }}
       </button>
     </div>
   </div>

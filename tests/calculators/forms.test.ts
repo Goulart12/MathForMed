@@ -307,6 +307,9 @@ describe('IdadeGestacionalForm', () => {
 
   it('swaps the LMP fields for the ultrasound ones', async () => {
     const wrapper = mountForm(IdadeGestacionalForm)
+    // The switch reads DUM/USG, never the lowercase internal values.
+    expect(wrapper.findAllComponents(AppToggle)[0]!.text()).toContain('DUM')
+    expect(wrapper.findAllComponents(AppToggle)[0]!.text()).toContain('USG')
     await pickToggle(wrapper, 0, 1)
     expect(wrapper.text()).toContain('Data da ultrassonografia')
     expect(wrapper.text()).not.toContain(dumLabel)
@@ -325,18 +328,20 @@ describe('IdadeGestacionalForm', () => {
     })
   })
 
-  it('validates the crown-rump length in the CCN mode', async () => {
+  it('offers only the reported age in the ultrasound mode — no CCN method', async () => {
     const wrapper = mountForm(IdadeGestacionalForm)
     await pickToggle(wrapper, 0, 1)
+    // The dum/usg switch is the only toggle left: the ig/ccn one is gone.
+    expect(wrapper.findAllComponents(AppToggle)).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('Comprimento crânio-caudal (CCN)')
+
     await dateField(wrapper, 'Data da ultrassonografia').setValue('2025-03-01')
-    await pickToggle(wrapper, 1, 1) // the second toggle: reported age vs CCN
-
-    await field(wrapper, 'Comprimento crânio-caudal (CCN)').setValue('1')
-    expect(cta(wrapper).attributes('disabled')).toBeDefined()
-
-    await field(wrapper, 'Comprimento crânio-caudal (CCN)').setValue('48')
-    expect(cta(wrapper).attributes('disabled')).toBeUndefined()
+    await field(wrapper, 'Semanas').setValue('12')
+    await field(wrapper, 'Dias').setValue('3')
     await submit(wrapper)
-    expect(wrapper.emitted('calculate')?.at(-1)?.[0]).toMatchObject({ crlMm: 48 })
+
+    const payload = wrapper.emitted('calculate')?.at(-1)?.[0] as Record<string, unknown>
+    expect(payload).toMatchObject({ usgDateIso: '2025-03-01', igWeeks: 12, igDays: 3 })
+    expect(payload).not.toHaveProperty('crlMm')
   })
 })

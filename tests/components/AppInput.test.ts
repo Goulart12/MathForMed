@@ -224,6 +224,22 @@ describe('AppToggle', () => {
     await wrapper.findAll('button')[1]!.trigger('click')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
+
+  it('paints the display label of an object option and emits its value', async () => {
+    const labeled = [
+      { value: 'dum', label: 'DUM' },
+      { value: 'usg', label: 'USG' },
+    ] as [{ value: string; label: string }, { value: string; label: string }]
+    const wrapper = mount(AppToggle, {
+      props: { label: 'Datação por', modelValue: 'dum', options: labeled },
+    })
+    expect(wrapper.text()).toContain('DUM')
+    expect(wrapper.text()).toContain('USG')
+    expect(wrapper.text()).not.toContain('dum')
+
+    await wrapper.findAll('button')[1]!.trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['usg'])
+  })
 })
 
 describe('AppButton', () => {
